@@ -6,6 +6,7 @@ const palette = {
     primaryText: '#333333',     // Cinza Escuro
     secondaryText: '#666666',   // Cinza Claro
     txtButton: '#FFFFFF',
+    danger:"#e65956"
   };
   
   export default palette;

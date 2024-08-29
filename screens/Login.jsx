@@ -12,24 +12,25 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
-import { useAlert } from "../context/AlertContext";
 import palette from "../styles/palette";
 import GlobalStyles from "../styles/global";
-import CustomAlert from "../components/Alert";
-
+import { showFlashMessage } from "../components/Message";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { showAlert } = useAlert();
   const { login } = useAuth();
 
-  const handleLogin = () => {
-    // Simulação de autenticação
-    if (email === "teste@teste.com" && password === "123456") {
-      login({ email });
+
+  const handleLogin = async () => {
+    if (email && password) {
+      try {
+        await login({email, senha: password});
+      } catch (error) {
+        alert("Erro de Login", "Credenciais inválidas");
+      }
     } else {
-        showAlert("Erro de Login", "Credenciais inválidas");
+      showFlashMessage('Preeencha todos os campos', 'danger');
     }
   };
 
@@ -42,7 +43,7 @@ const LoginScreen = ({ navigation }) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
-        keyboardVerticalOffset={50} // Ajuste conforme necessário
+        keyboardVerticalOffset={50} 
       >
         <View style={styles.formContainer}>
           <TextInput
@@ -75,8 +76,7 @@ const LoginScreen = ({ navigation }) => {
             <Text style={GlobalStyles.textButton}>Login</Text>
           </TouchableOpacity>
 
-            <Text style={styles.link}>Ainda não tem um cadastro?</Text>
-       
+          <Text style={styles.link}>Ainda não tem um cadastro?</Text>
 
           <TouchableOpacity
             style={styles.cadastroButton}
@@ -86,7 +86,7 @@ const LoginScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-
+  
     </ImageBackground>
   );
 };
@@ -112,18 +112,12 @@ const styles = StyleSheet.create({
     marginTop: 220,
     gap: 20,
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
   link: {
     color: palette.highlightGreen,
     fontWeight: "600",
     textAlign: "right",
-    fontSize:16,
-    
+    fontSize: 16,
   },
-
   cadastroButton: {
     backgroundColor: palette.secondaryGreen,
     width: "100%",
@@ -139,9 +133,8 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-end",
-    marginTop:-10,
-    marginBottom:-10
-
+    marginTop: -10,
+    marginBottom: -10,
   },
 });
 

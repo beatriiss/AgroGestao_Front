@@ -1,3 +1,4 @@
+// src/screens/RegisterScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -8,37 +9,43 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Alert, // Usando Alert para mostrar mensagens ao usuário
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import palette from "../styles/palette";
 import GlobalStyles from "../styles/global";
+import { showFlashMessage } from "../components/Message";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { register } = useAuth(); // Assumindo que existe uma função de registro no contexto de autenticação
+  const { register } = useAuth();
 
-  const handleRegister = () => {
-    // Simulação de registro
+  const handleRegister = async () => {
     if (name && email && password) {
-      register({ name, email, password });
-      alert("Usuário registrado com sucesso");
+      try {
+        await register({ nome:name, email, senha:password });
+        Alert.alert("Sucesso", "Usuário registrado com sucesso");
+      } catch (error) {
+        Alert.alert("Erro", "Erro ao registrar usuário. Por favor, tente novamente.");
+        console.log(error)
+      }
     } else {
-      alert("Por favor, preencha todos os campos");
+      showFlashMessage('Preencha todos os campos', 'danger');
     }
   };
 
   return (
     <ImageBackground
-      source={require("../assets/Background_login.png")} // Certifique-se de ter essa imagem em sua pasta de assets
+      source={require("../assets/Background_login.png")}
       style={styles.background}
       resizeMode="cover"
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
-        keyboardVerticalOffset={50} // Ajuste conforme necessário
+        keyboardVerticalOffset={50}
       >
         <View style={styles.formContainer}>
           <TextInput
@@ -47,14 +54,12 @@ const RegisterScreen = ({ navigation }) => {
             onChangeText={setName}
             style={GlobalStyles.input}
           />
-
           <TextInput
             placeholder="Digite seu email"
             value={email}
             onChangeText={setEmail}
             style={GlobalStyles.input}
           />
-
           <TextInput
             placeholder="Digite sua senha"
             value={password}
@@ -62,14 +67,10 @@ const RegisterScreen = ({ navigation }) => {
             secureTextEntry
             style={GlobalStyles.input}
           />
-
           <TouchableOpacity style={GlobalStyles.primaryButton} onPress={handleRegister}>
             <Text style={GlobalStyles.textButton}>Cadastrar</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Login")}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text style={styles.link}>Já possui uma conta? Faça login</Text>
           </TouchableOpacity>
         </View>
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: "90%",
-    backgroundColor: "rgba(255, 255, 255, 0.8)", // Fundo semi-transparente
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
   link: {
     color: palette.highlightGreen,
     fontWeight: "600",
-    textAlign: "center", // Alinhamento centralizado para melhorar a leitura
+    textAlign: "center",
     fontSize: 16,
     marginTop: 20,
   },

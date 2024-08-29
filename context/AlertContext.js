@@ -52,11 +52,11 @@ const CustomAlert = ({ visible, onClose, title, message }) => {
       <View style={styles.overlay}>
         <View style={styles.alertBox}>
           {/* Adiciona a logo do aplicativo */}
-          <Image
+          {/* <Image
             source={require("../assets/logo.png")} // Substitua pelo caminho correto da sua logo
             style={styles.logo}
             resizeMode="contain"
-          />
+          /> */}
 
           {/* Título do alerta */}
           {title && <Text style={styles.title}>{title}</Text>}
