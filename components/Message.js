@@ -29,6 +29,6 @@ export const showFlashMessage = (message, type = 'info') => {
     backgroundColor: backgroundColor,
     title: title,
     floating: true,
-    style: { marginTop: 30 }
+    style: { marginTop: 10 }
   });
 };

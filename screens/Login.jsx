@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   ImageBackground,
   StyleSheet,
   KeyboardAvoidingView,
