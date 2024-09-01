@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }) => {
       console.log(response.data)
       showFlashMessage('Cadstro realizado com sucesso!', 'success');
       showFlashMessage('Usuário Autenticado!', 'success');
+      console.log(response.data)
       return response.data;
     } catch (error) {
       console.error('Erro ao cadastrar usuário:', error);
