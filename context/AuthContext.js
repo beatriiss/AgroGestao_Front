@@ -13,8 +13,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async ({ email, senha }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/users/login`, { email, senha });
-      setCurrentUser(response.data);
+      const response = await axios.post(`http://192.168.0.108:3030/users/login`, { email, senha });
+      setCurrentUser(response.data.user);
       showFlashMessage('Login realizado com sucesso!', 'success');
     } catch (error) {
       if (error.response) {
@@ -38,10 +38,8 @@ export const AuthProvider = ({ children }) => {
   
   const register = async (userData) => {
     try {
-      console.log("Dentro do try no front auth, ", userData)
-      const response = await axios.post(`${API_BASE_URL}/users/`, userData);
-      setCurrentUser(response.data);
-      console.log(response.data)
+      const response = await axios.post(`http://192.168.0.108:3030/users/`, userData);
+      setCurrentUser(response.data.user);
       showFlashMessage('Cadstro realizado com sucesso!', 'success');
       showFlashMessage('Usuário Autenticado!', 'success');
       console.log(response.data)

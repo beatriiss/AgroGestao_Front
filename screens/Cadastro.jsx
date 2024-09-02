@@ -15,6 +15,7 @@ import { useAuth } from "../context/AuthContext";
 import palette from "../styles/palette";
 import GlobalStyles from "../styles/global";
 import { showFlashMessage } from "../components/Message";
+import validate from "../utils/functions/validate"
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -24,15 +25,20 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleRegister = async () => {
     if (name && email && password) {
-      try {
-        await register({ nome:name, email, senha:password });
-        Alert.alert("Sucesso", "Usuário registrado com sucesso");
-      } catch (error) {
-        Alert.alert("Erro", "Erro ao registrar usuário. Por favor, tente novamente.");
-        console.log(error)
+      const validateEmail = await validate('email', email);
+      if (validateEmail) {
+        try {
+          await register({ nome: name, email, senha: password });
+          Alert.alert("Sucesso", "Usuário registrado com sucesso");
+        } catch (error) {
+          Alert.alert("Erro", "Erro ao registrar usuário. Por favor, tente novamente.");
+          console.log(error)
+        }
+      }else{
+        showFlashMessage('Email invalido', 'warning')
       }
     } else {
-      showFlashMessage('Preencha todos os campos', 'danger');
+      showFlashMessage('Preencha todos os campos', 'warning');
     }
   };
 
