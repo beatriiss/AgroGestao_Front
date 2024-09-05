@@ -17,6 +17,7 @@ const GlobalStyles = StyleSheet.create({
     borderWidth: 2,
     paddingHorizontal: 10,
     borderRadius: 5,
+    color:"#000"
   },
   textButton: {
     color: '#FFFFFF',  

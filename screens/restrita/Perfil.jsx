@@ -1,91 +1,179 @@
-// src/components/InfoScreen.js
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, KeyboardAvoidingView, Platform, Modal } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  StatusBar,
+  KeyboardAvoidingView,
+  Platform,
+  Modal,
+  Image,
+  ScrollView,
+} from "react-native";
+import { useAuth } from "../../context/AuthContext";
 import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
-import { ModalPassword } from '../../components/Modal/ModalPassword';
-
-
+import { ModalPassword } from "../../components/Modal/ModalPassword";
+import Header from "../../components/Header";
 const Perfil = () => {
-  const { logout, currentUser } = useAuth();
-  const [nome, setNome] = useState(currentUser.nome)
-  const [email, setEmail] = useState(currentUser.email)
-  const [password, setPassword] = useState(currentUser.senha)
-  const [edit, setEdit] = useState(false)
-  const [modalVisible, setModalVisible] = useState(false)
+  const { logout, currentUser, editUser } = useAuth();
+  const [nome, setNome] = useState(currentUser?.nome || "");
+  const [email, setEmail] = useState(currentUser?.email || "");
+  const [password, setPassword] = useState(currentUser?.senha || "");
+  const [edit, setEdit] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
+  const handleSave = async () => {
+    if (currentUser) {
+      try {
+        const userId = currentUser.id; // Identificador do usuário
+        const userData = { nome, email, senha: password };
+        await editUser(userId, userData);
+        setEdit(false);
+      } catch (error) {
+        console.error("Erro ao salvar usuário:", error);
+      }
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={50}
+      keyboardVerticalOffset={0} // Ajuste para compensar a altura do teclado
+      style={{ flex: 1 }}
     >
-      {/* Inicio do header */}
-      <StatusBar backgroundColor={palette.primaryGreen} translucent={false} />
-      <View style={styles.header}>
-        <Text style={styles.textheader}>Olá, {currentUser.nome}</Text>
-        <TouchableOpacity onPress={logout}>
-          <Text style={GlobalStyles.textButton}>Sair</Text>
-        </TouchableOpacity>
-      </View>
-      {/* Fim do header */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Header screenName={edit ? "Edição de Perfil" : "Perfil"} />
+        <View style={styles.container}>
+          <Image
+            style={styles.logo}
+            source={require("../../assets/logo.png")}
+          />
+          <View style={styles.form}>
+            <Text style={styles.legend}>Nome:</Text>
+            <TextInput
+              selectionColor={palette.highlightGreen}
+              onChangeText={(e) => setNome(e)}
+              style={[GlobalStyles.input, !edit && { color: "#000" }]}
+              placeholder="Nome"
+              editable={edit}
+              value={nome}
+            ></TextInput>
 
+            <Text style={styles.legend}>Email:</Text>
+            <TextInput
+              selectionColor={palette.highlightGreen}
+              onChangeText={(e) => setEmail(e)}
+              style={[GlobalStyles.input, !edit && { color: "#000" }]}
+              placeholder="email"
+              editable={edit}
+              value={email}
+            ></TextInput>
 
-      <View style={styles.container}>
-        <Text style={styles.legend} >nome:</Text>
-        <TextInput onChangeText={(e) => setNome(e)} style={GlobalStyles.input} placeholder='Nome' editable={edit} value={nome}></TextInput>
+            <Text style={styles.legend}>Senha:</Text>
+            <TextInput
+              selectionColor={palette.highlightGreen}
+              onChangeText={(e) => setPassword(e)}
+              style={[GlobalStyles.input, !edit && { color: "#000" }]}
+              placeholder="senha"
+              secureTextEntry={!edit}
+              editable={edit}
+              value={password}
+            ></TextInput>
 
-        <Text style={styles.legend} >email:</Text>
-        <TextInput onChangeText={(e) => setEmail(e)} style={GlobalStyles.input} placeholder='email' editable={edit} value={email}></TextInput>
-
-        <Text style={styles.legend} >senha:</Text>
-        <TextInput onChangeText={(e) => setPassword(e)} style={GlobalStyles.input} placeholder='senha' secureTextEntry={!edit} editable={edit} value={password}></TextInput>
-
-        {edit ?
-          <TouchableOpacity style={[GlobalStyles.primaryButton, styles.button]} onPress={() => { setEdit(false) }}>
-            <Text style={GlobalStyles.textButton}>Salvar!</Text>
-          </TouchableOpacity> :
-          <TouchableOpacity style={[GlobalStyles.primaryButton, styles.button]} onPress={() => { setModalVisible(true) }}>
-            <Text style={GlobalStyles.textButton}>Editar</Text>
-          </TouchableOpacity>
-        }
-
-      </View>
-      <Modal visible={modalVisible} animationType='fade' transparent={true}>
-        <ModalPassword editable={() => setEdit(true)} handleClose={() => setModalVisible(false)} />
+            {edit ? (
+              <View style={styles.buttons}>
+                <TouchableOpacity
+                  style={[
+                    GlobalStyles.primaryButton,
+                    styles.button,
+                    { width: "48%", backgroundColor: palette.danger },
+                  ]}
+                  onPress={() => setEdit(false)}
+                >
+                  <Text style={GlobalStyles.textButton}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    GlobalStyles.primaryButton,
+                    styles.button,
+                    { width: "48%" },
+                  ]}
+                  onPress={handleSave}
+                >
+                  <Text style={GlobalStyles.textButton}>Salvar</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[GlobalStyles.primaryButton, styles.button]}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text style={GlobalStyles.textButton}>Editar</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+      <Modal visible={modalVisible} animationType="fade" transparent={true}>
+        <ModalPassword
+          editable={() => setEdit(true)}
+          handleClose={() => setModalVisible(false)}
+        />
       </Modal>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  // Inicio do style do header
+  // Início do estilo do header
   header: {
     flexDirection: "row",
     backgroundColor: palette.primaryGreen,
-    padding: 20,
-    justifyContent: "space-between"
+    padding: 16,
+    justifyContent: "space-between",
   },
   textheader: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 18,
+    color: "#fff",
+    fontSize: 16,
   },
-  // Fim do Style do header
-
-
+  // Fim do estilo do header
   container: {
+    padding: 20,
+    display: "flex",
     justifyContent: "center",
-    padding: 30
+    alignItems: "center",
+    flex: 1,
+  },
+  buttons:{
+    display:'flex',
+    width:'100%',
+    flexDirection:'row',
+    justifyContent:'space-between'
+
+  },
+  form: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
   },
   legend: {
-    margin: 15,
-    fontWeight: '600',
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+    marginVertical: 10,
   },
   button: {
-    marginTop: 50
-  }
+    marginTop: 16,
+  },
+  logo: {
+    width: 250,
+    height: 250,
+    marginTop: -140,
+  },
 });
+
 export default Perfil;

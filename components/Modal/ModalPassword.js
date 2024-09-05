@@ -3,6 +3,8 @@ import GlobalStyles from "../../styles/global";
 import palette from "../../styles/palette";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react"
+import { showFlashMessage } from './../Message';
+import FlashMessage from "react-native-flash-message";
 
 export function ModalPassword({ editable, handleClose }) {
     const { currentUser } = useAuth()
@@ -13,6 +15,7 @@ export function ModalPassword({ editable, handleClose }) {
             editable()
             handleClose()
         } else {
+            showFlashMessage('Senha incorreta!', 'warning');
             
         }
     }
@@ -41,6 +44,7 @@ export function ModalPassword({ editable, handleClose }) {
                 </View>
 
             </View>
+
         </View>
     )
 }
@@ -53,12 +57,13 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     content: {
-        backgroundColor: palette.secondaryGreen,
-        width: `80%`,
+        backgroundColor: palette.highlightGreen,
+        width: `93%`,
         padding: 24,
         alignItems: `center`,
         justifyContent: `center`,
-        borderRadius: 8
+        borderRadius: 8, 
+        marginTop: -70
     },
     input: {
         backgroundColor: '#fff',
