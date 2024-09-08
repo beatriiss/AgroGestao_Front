@@ -7,7 +7,7 @@ export const showFlashMessage = (message, type = 'info') => {
 
   switch (type) {
     case 'success':
-      backgroundColor = palette.primaryGreen;
+      backgroundColor = palette.secondaryGreen;
       title = 'Sucesso';
       break;
     case 'danger':

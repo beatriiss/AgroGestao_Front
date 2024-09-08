@@ -1,32 +1,37 @@
-// src/components/PropertiesScreen.js
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext'; // Certifique-se de ter este hook para obter o usuário autenticado
 import { url } from '../../config/url';
 import Header from '../../components/Header';
 import GlobalStyles from '../../styles/global';
 import palette from '../../styles/palette';
+import { useFocusEffect } from '@react-navigation/native'; // Importe o useFocusEffect
+
 const Propriedades = ({ navigation }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
 
-  useEffect(() => {
-    // Função para buscar propriedades do usuário
-    const fetchProperties = async () => {
-      try {
-        const response = await axios.get(`${url}/properties/user/${currentUser.id}`);
-        setProperties(response.data.property);
-        setLoading(false);
-      } catch (error) {
-        console.error('Erro ao buscar propriedades:', error);
-        setLoading(false);
-      }
-    };
+  // Função para buscar propriedades do usuário
+  const fetchProperties = async () => {
+    try {
+      const response = await axios.get(`${url}/properties/user/${currentUser.id}`);
+      setProperties(response.data.property);
+    } catch (error) {
+      console.error('Erro ao buscar propriedades:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProperties();
-  }, [currentUser.id]);
+  // Usar useFocusEffect para buscar dados ao abrir a tela
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true); // Exibir o estado de carregamento sempre que a tela for reaberta
+      fetchProperties();
+    }, [currentUser.id])
+  );
 
   const handleAddProperty = () => {
     // Navegar para a tela de adicionar propriedade
@@ -42,37 +47,50 @@ const Propriedades = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0} // Ajuste para compensar a altura do teclado
+      style={{ flex: 1 }}
+    >
       <Header screenName={"Propriedades"} />
-      {properties.length === 0 ? (
-        <View style={styles.centered}>
-          <Text>Ainda não há propriedades cadastradas.</Text>
+      <View style={styles.container}>
+        {properties.length === 0 ? (
+          <View style={styles.centered}>
+            <Text>Ainda não há propriedades cadastradas.</Text>
+          </View>
+        ) : (
+          <>
+          <Text style={{fontSize:18, paddingHorizontal:20, paddingVertical:10, fontWeight:'600'
+          }}>Essas são as suas propriedades:</Text>
+          <FlatList
+            data={properties}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.propertyCard} onPress={()=> navigation.navigate("DetalhePropriedade", {propriedadeID: item.id})} >
+                <Text style={styles.propertyText}>{item.nome}</Text>
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={styles.listContent}
+            style={styles.flatList}
+            overScrollMode="never"
+          />
+          </>
+        )}
+        {/* Botão fixo na parte inferior da tela */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={GlobalStyles.primaryButton} onPress={handleAddProperty}>
+            <Text style={GlobalStyles.textButton}>Adicionar Nova Propriedade</Text>
+          </TouchableOpacity>
         </View>
-      ) : (
-        <FlatList
-          data={properties}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.propertyCard}>
-              <Text style={styles.propertyText}>{item.nome}</Text>
-            </View>
-          )}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
-      {/* Botão fixo na parte inferior da tela */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[GlobalStyles.primaryButton, {bottom: 120}]} onPress={handleAddProperty}>
-          <Text style={GlobalStyles.textButton}>Adicionar Nova Propriedade</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+
   },
   centered: {
     flex: 1,
@@ -81,20 +99,26 @@ const styles = StyleSheet.create({
   },
   listContent: {
     flexGrow: 1,
-    marginTop:30  },
+    paddingHorizontal:10
+
+  },
+  flatList: {
+    flex: 1,
+    marginBottom: 200, 
+
+  },
   propertyCard: {
     backgroundColor: '#fff', // Use a cor secundária desejada
     padding: 16,
     margin: 8,
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 1, height:10 },
+    shadowOffset: { width: 1, height: 10 },
     shadowOpacity: 0.9,
     shadowRadius: 4,
     elevation: 5,
-    borderColor:palette.highlightGreen,
-    borderWidth:2
-    
+    borderColor: palette.highlightGreen,
+    borderWidth: 2,
   },
   propertyText: {
     fontSize: 16,
@@ -102,21 +126,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     padding: 16,
-    backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-  },
-  addButton: {
-    backgroundColor: '#007bff', // Use a cor desejada para o botão
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    bottom: 120
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    position: 'absolute',
+    bottom: 110,
+    width: '100%',
   },
 });
 

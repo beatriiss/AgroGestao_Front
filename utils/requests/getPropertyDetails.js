@@ -1,16 +1,17 @@
 import axios from 'axios';
 import { url } from '../../config/url';
+import { showFlashMessage } from "../../components/Message";
 
-
-export const updateUser = async (userId, userData) => {
+export const getPropertyDetails = async (id) => {
   try {
-    const response = await axios.put(`${url}/users/${userId}`, userData);
+    const response = await axios.get(`${url}/properties/${id}`);
+    showFlashMessage('Os detalhes da propriedade foram obtidos!', 'success');
     return response.data; // Retorna os dados da resposta da API
   } catch (error) {
     // Lida com erros e pode retornar uma mensagem ou lançar um erro
     if (error.response) {
       // O servidor respondeu com um status diferente de 2xx
-      console.error('Erro de resposta:', error.response.data);
+      console.error('Erro de resposta:', error);
     } else if (error.request) {
       // A solicitação foi feita, mas sem resposta
       console.error('Erro de solicitação:', error.request);

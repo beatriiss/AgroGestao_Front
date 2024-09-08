@@ -35,19 +35,7 @@ const Home = () => {
 };
 
 const styles = StyleSheet.create({
-  // Inicio do style do header
-  header: {
-    flexDirection: "row",
-    backgroundColor: palette.primaryGreen,
-    padding: 20,
-    justifyContent: "space-between",
-  },
-  textHeader: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-    fontSize: 18,
-  },
-  // Fim do Style do header
+
 
   apresentacao: {
     padding: 15,

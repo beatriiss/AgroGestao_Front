@@ -1,25 +1,64 @@
 // src/components/PropertiesScreen.js
-import React, { useState } from 'react';
-import { View, Image, KeyboardAvoidingView, Platform, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import { useAuth } from '../../context/AuthContext'; // Certifique-se de ter este hook para obter o usuário autenticado
-import Header from '../../components/Header';
-import GlobalStyles from '../../styles/global';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Keyboard
+} from "react-native";
+import { useAuth } from "../../context/AuthContext"; // Certifique-se de ter este hook para obter o usuário autenticado
+import Header from "../../components/Header";
+import GlobalStyles from "../../styles/global";
+import { createProperty } from "../../utils/requests/createProperty";
+import { showFlashMessage } from "../../components/Message";
 
 const AdicionarPropriedade = ({ navigation }) => {
-
   const [ident, setIdent] = useState("");
   const [area, setArea] = useState("");
   const [local, setLocal] = useState("");
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   const handlePropRegister = async () => {
-    if (ident && area && loc) {
+    if (ident && area && local && currentUser) {
+      
       try {
-
-      } catch (error) {
-
-      }
+        const propertyData = {nome:ident, localizacao:local, area_total:area, usuario_id:currentUser.id}
+      const response = await createProperty(propertyData)
+      console.log(response)
+      navigation.navigate("Home")
+      } catch (error) {console.log("erro cadastrando a propriedade")}
+    }else{
+      console.log("Dados incorretos")
+      showFlashMessage("Preeencha os dados corretamente!", "danger")
     }
-  }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -27,13 +66,15 @@ const AdicionarPropriedade = ({ navigation }) => {
       keyboardVerticalOffset={0} // Ajuste para compensar a altura do teclado
       style={{ flex: 1 }}
     >
+      <Header screenName={"Adicionar Propriedade"} />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Header screenName={"Adicionar Propriedade"} />
         <View style={styles.container}>
-          <Image
-            style={styles.logo}
-            source={require("../../assets/logo.png")}
-          />
+          {!keyboardVisible && (
+            <Image
+              style={styles.logo}
+              source={require("../../assets/logo.png")}
+            />
+          )}
 
           <View style={styles.form}>
             <TextInput
@@ -43,7 +84,7 @@ const AdicionarPropriedade = ({ navigation }) => {
               style={[GlobalStyles.input, styles.input]}
             />
             <TextInput
-              placeholder="Area Total"
+              placeholder="Area Total (em Hectares)"
               value={area}
               onChangeText={setArea}
               style={[GlobalStyles.input, styles.input]}
@@ -56,7 +97,10 @@ const AdicionarPropriedade = ({ navigation }) => {
               style={[GlobalStyles.input, styles.input, styles.local]}
             />
 
-            <TouchableOpacity style={GlobalStyles.primaryButton} onPress={handlePropRegister} >
+            <TouchableOpacity
+              style={GlobalStyles.primaryButton}
+              onPress={handlePropRegister}
+            >
               <Text style={GlobalStyles.textButton}>Cadastrar Propiedade</Text>
             </TouchableOpacity>
           </View>

@@ -15,6 +15,7 @@ import palette from "../styles/palette";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ModalPassword } from "./../components/Modal/ModalPassword";
 import AdicionarPropriedade from "../screens/restrita/AdicionarPropriedade";
+import DetalhePropriedade from './../screens/restrita/DetalhePropriedade';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -151,6 +152,8 @@ const AppNavigator = () => {
         <Stack.Screen name="Home" component={HomeTabs} />
         <Stack.Screen name="AdicionarPropriedade"   
         component={AdicionarPropriedade} />
+                <Stack.Screen name="DetalhePropriedade"   
+        component={DetalhePropriedade} />
         </>
       ) : (
         <>
