@@ -1,70 +1,101 @@
 // src/components/PropertiesScreen.js
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { View, Image, KeyboardAvoidingView, Platform, ScrollView, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { useAuth } from '../../context/AuthContext'; // Certifique-se de ter este hook para obter o usuário autenticado
-import { url } from '../../config/url';
 import Header from '../../components/Header';
 import GlobalStyles from '../../styles/global';
-import palette from '../../styles/palette';
 
 const AdicionarPropriedade = ({ navigation }) => {
- 
+
+  const [ident, setIdent] = useState("");
+  const [area, setArea] = useState("");
+  const [local, setLocal] = useState("");
+
+  const handlePropRegister = async () => {
+    if (ident && area && loc) {
+      try {
+
+      } catch (error) {
+
+      }
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      <Header screenName={"Adicionar Propriedade"} />
-    
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0} // Ajuste para compensar a altura do teclado
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Header screenName={"Adicionar Propriedade"} />
+        <View style={styles.container}>
+          <Image
+            style={styles.logo}
+            source={require("../../assets/logo.png")}
+          />
+
+          <View style={styles.form}>
+            <TextInput
+              placeholder="Identificação"
+              value={ident}
+              onChangeText={setIdent}
+              style={[GlobalStyles.input, styles.input]}
+            />
+            <TextInput
+              placeholder="Area Total"
+              value={area}
+              onChangeText={setArea}
+              style={[GlobalStyles.input, styles.input]}
+            />
+            <TextInput
+              placeholder="Localização"
+              multiline
+              value={local}
+              onChangeText={setLocal}
+              style={[GlobalStyles.input, styles.input, styles.local]}
+            />
+
+            <TouchableOpacity style={GlobalStyles.primaryButton} onPress={handlePropRegister} >
+              <Text style={GlobalStyles.textButton}>Cadastrar Propiedade</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
-  },
-  centered: {
+    padding: 20,
+    paddingTop: 60,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  listContent: {
-    flexGrow: 1,
-    marginTop:30  },
-  propertyCard: {
-    backgroundColor: '#fff', // Use a cor secundária desejada
-    padding: 16,
-    margin: 8,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 1, height:10 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
-    elevation: 5,
-    borderColor:palette.highlightGreen,
-    borderWidth:2
-    
+
+  logo: {
+    width: 250,
+    height: 250,
+    marginTop: -140,
   },
-  propertyText: {
-    fontSize: 16,
-    color: '#333',
+
+  form: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
   },
-  buttonContainer: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+
+  input: {
+    marginVertical: 15,
+    height: 50,
   },
-  addButton: {
-    backgroundColor: '#007bff', // Use a cor desejada para o botão
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    bottom: 120
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+
+  local: {
+    height: 100,
   },
 });
 

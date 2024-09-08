@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  StatusBar,
   KeyboardAvoidingView,
   Platform,
   Modal,
@@ -17,8 +16,10 @@ import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
 import { ModalPassword } from "../../components/Modal/ModalPassword";
 import Header from "../../components/Header";
+
+
 const Perfil = () => {
-  const { logout, currentUser, editUser } = useAuth();
+  const { currentUser, editUser } = useAuth();
   const [nome, setNome] = useState(currentUser?.nome || "");
   const [email, setEmail] = useState(currentUser?.email || "");
   const [password, setPassword] = useState(currentUser?.senha || "");
