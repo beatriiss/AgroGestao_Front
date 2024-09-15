@@ -8,7 +8,10 @@ import GlobalStyles from '../../styles/global';
 import palette from '../../styles/palette';
 import { useFocusEffect } from '@react-navigation/native'; // Importe o useFocusEffect
 import { getPropertyDetails } from '../../utils/requests/getPropertyDetails';
-const AdicionarPropriedade = ({ navigation, route }) => {
+
+
+
+const DetalhesPropriedade = ({ navigation, route }) => {
   const [propertie, setPropertie] = useState(null);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
@@ -17,8 +20,7 @@ const AdicionarPropriedade = ({ navigation, route }) => {
   // Função para buscar AdicionarPropriedade do usuário
   const fetchPropertie = async () => {
     try {
-      const response = await getPropertyDetails(route?.params?.propriedadeID)
-      console.log(response)
+      setPropertie(await getPropertyDetails(route?.params?.propriedadeID));
     } catch (error) {
       console.error('Erro ao buscar AdicionarPropriedade:', error);
     } finally {
@@ -43,7 +45,25 @@ const AdicionarPropriedade = ({ navigation, route }) => {
     >
       <Header screenName={"Detalhe da Propriedade"} />
       <View style={styles.container}>
-       
+        <View style={styles.dados}>
+          <Text style={styles.textProp}>Dados da propriedade: {propertie.nome}</Text>
+          <Text style={styles.text}>Localização: {propertie.localizacao}</Text>
+          <Text style={styles.text}>Area Total: {propertie.area_total}</Text>
+        </View>
+
+        <View style={styles.dados}>
+          <Text style={styles.textProp}>Criações dessa propriedade:</Text>
+          <View style={styles.dados}>
+
+          </View>
+        </View>
+
+        <View style={styles.dados}>
+          <Text style={styles.textProp}>Culturas dessa propriedade:</Text>
+          <View style={styles.dados}>
+
+          </View>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -54,7 +74,24 @@ const styles = StyleSheet.create({
     flex: 1,
 
   },
- 
+
+  dados: {
+    margin: 20,
+    padding: 10,
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: palette.primaryGreen,
+  },
+
+  textProp: {
+    marginBottom: 20,
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  
+  text: {
+    fontSize: 20,
+  },
 });
 
-export default AdicionarPropriedade;
+export default DetalhesPropriedade;

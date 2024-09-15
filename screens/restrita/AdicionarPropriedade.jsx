@@ -47,14 +47,13 @@ const AdicionarPropriedade = ({ navigation }) => {
 
   const handlePropRegister = async () => {
     if (ident && area && local && currentUser) {
-      
+
       try {
-        const propertyData = {nome:ident, localizacao:local, area_total:area, usuario_id:currentUser.id}
-      const response = await createProperty(propertyData)
-      console.log(response)
-      navigation.navigate("Home")
-      } catch (error) {console.log("erro cadastrando a propriedade")}
-    }else{
+        const propertyData = { nome: ident, localizacao: local, area_total: area, usuario_id: currentUser.id }
+        const response = await createProperty(propertyData)
+        navigation.navigate("DetalhePropriedade", { propriedadeID: response.property.insertId })
+      } catch (error) { console.log("erro cadastrando a propriedade") }
+    } else {
       console.log("Dados incorretos")
       showFlashMessage("Preeencha os dados corretamente!", "danger")
     }
@@ -85,6 +84,7 @@ const AdicionarPropriedade = ({ navigation }) => {
             />
             <TextInput
               placeholder="Area Total (em Hectares)"
+              inputMode="numeric"
               value={area}
               onChangeText={setArea}
               style={[GlobalStyles.input, styles.input]}
