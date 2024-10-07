@@ -10,7 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Keyboard
+  Keyboard,
 } from "react-native";
 import { useAuth } from "../../context/AuthContext"; // Certifique-se de ter este hook para obter o usuário autenticado
 import Header from "../../components/Header";
@@ -47,16 +47,23 @@ const AdicionarPropriedade = ({ navigation }) => {
 
   const handlePropRegister = async () => {
     if (ident && area && local && currentUser) {
-      
       try {
-        const propertyData = {nome:ident, localizacao:local, area_total:area, usuario_id:currentUser.id}
-      const response = await createProperty(propertyData)
-      console.log(response)
-      navigation.navigate("Home")
-      } catch (error) {console.log("erro cadastrando a propriedade")}
-    }else{
-      console.log("Dados incorretos")
-      showFlashMessage("Preeencha os dados corretamente!", "danger")
+        const propertyData = {
+          nome: ident,
+          localizacao: local,
+          area_total: area,
+          usuario_id: currentUser.id,
+        };
+        const response = await createProperty(propertyData);
+        navigation.navigate("DetalhePropriedade", {
+          propriedadeID: response.property.insertId,
+        });
+      } catch (error) {
+        console.log("erro cadastrando a propriedade");
+      }
+    } else {
+      console.log("Dados incorretos");
+      showFlashMessage("Preeencha os dados corretamente!", "danger");
     }
   };
 
@@ -76,7 +83,7 @@ const AdicionarPropriedade = ({ navigation }) => {
             />
           )}
 
-          <View style={styles.form}>
+          <View style={[styles.form, keyboardVisible && { marginTop: -180 }]}>
             <TextInput
               placeholder="Identificação"
               value={ident}
@@ -84,7 +91,8 @@ const AdicionarPropriedade = ({ navigation }) => {
               style={[GlobalStyles.input, styles.input]}
             />
             <TextInput
-              placeholder="Area Total (em Hectares)"
+              placeholder="Area Total (em tarefas)"
+              inputMode="numeric"
               value={area}
               onChangeText={setArea}
               style={[GlobalStyles.input, styles.input]}

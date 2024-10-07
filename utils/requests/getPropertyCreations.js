@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { url } from '../../config/url';
 
-export const getPropertyDetails = async (id) => {
+export const getPropertyCreations = async (propertyId) => {
   try {
-    const response = await axios.get(`${url}/properties/${id}`);
-    return response.data; // Retorna os dados da resposta da API
+    const response = await axios.get(`${url}/creations/property/${propertyId}`);
+    return response.data.creations; // Retorna os dados da resposta da API
   } catch (error) {
     // Lida com erros e pode retornar uma mensagem ou lançar um erro
     if (error.response) {
