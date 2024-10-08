@@ -1,17 +1,16 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import palette from "../styles/palette";
-
+import moment from "moment";
 const especiesComuns = {
-  Gado: require("../assets/especies/Gado.png"),
-  Suínos: require("../assets/especies/Suinos.png"),
-  Ovelhas: require("../assets/especies/Ovelhas.png"),
-  Cabras: require("../assets/especies/Cabras.png"),
-  Frangos: require("../assets/especies/Frangos.png"),
-  Patos: require("../assets/especies/Patos.png"),
-  Cavalos: require("../assets/especies/Cavalos.png"),
+  Abóbora: require("../assets/cultivos/abobora.png"),
+  Aipim: require("../assets/cultivos/aipim.png"),
+  Laranja: require("../assets/cultivos/laranja.png"),
+  Melancia: require("../assets/cultivos/melancia.png"),
+  Amendoim: require("../assets/cultivos/amendoim.png"),
+  Milho: require("../assets/cultivos/milho.png")
 };
 
 const CardCriacoes = ({ item }) => {
@@ -20,14 +19,15 @@ const CardCriacoes = ({ item }) => {
   console.log(item)
 
   // Obtém a imagem correspondente à espécie
-  const imageSource = especiesComuns[item.especie];
+  const imageSource = especiesComuns[item.tipo];
 
   return (
-    <TouchableOpacity onPress={()=> navigation.navigate("DetalheCriacao", {CriacaoID: item.id})} style={styles.card}>
+    <View style={styles.card}>
       <View style={styles.leftContent}>
       <Text style={styles.text}>Nome: {item.nome}</Text>
-        <Text style={styles.text}>Peso Médio: {item.peso_medio} arrobas</Text>
-        <Text style={styles.text}>Número de animais: {item.numero_animais}</Text>
+        <Text style={styles.text}>Area Plantio: {item.area_plantada} tarefas</Text>
+        <Text style={styles.text}>Data Plantio: {moment(item.data_plantio).format("DD/MM/YYYY")}</Text>
+
       </View>
       <View style={styles.rightContent}>
         {imageSource && (
@@ -38,7 +38,7 @@ const CardCriacoes = ({ item }) => {
           />
         )}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 

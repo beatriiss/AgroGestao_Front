@@ -12,6 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { getPropertyDetails } from "../../utils/requests/getPropertyDetails";
 import { getPropertyCreations } from "../../utils/requests/getPropertyCreations";
+import { getPropertyCultivations } from "../../utils/requests/getPropertyCultivations";
 import Header from "../../components/Header";
 import CardCriacoes from "../../components/CardCriacoes";
 import palette from "../../styles/palette";
@@ -19,7 +20,7 @@ import GlobalStyles from "../../styles/global";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-
+import CardCultivos from "../../components/CardCultivos";
 const DetalhesPropriedade = ({ navigation, route }) => {
   const [property, setProperty] = useState(null);
   const [creations, setCreations] = useState(null);
@@ -37,7 +38,7 @@ const DetalhesPropriedade = ({ navigation, route }) => {
       setProperty(await getPropertyDetails(route?.params?.propriedadeID));
       setCreations(await getPropertyCreations(route?.params?.propriedadeID));
       // Aqui você faria uma requisição para obter as culturas, se aplicável.
-      // setCultures(await getPropertyCultures(route?.params?.propriedadeID));
+      setCultures(await getPropertyCultivations(route?.params?.propriedadeID));
     } catch (error) {
       console.error("Erro ao buscar a dados da propriedade:", error);
     } finally {
@@ -116,12 +117,27 @@ const DetalhesPropriedade = ({ navigation, route }) => {
     }
 
     // Exemplo: Lista de culturas
-    return (
+    return ( <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
+     
       <FlatList
         data={cultures}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <Text>{item.nome}</Text>}
+        renderItem={({ item }) => <CardCultivos item={item} />}
+        overScrollMode="never"
+        
       />
+      <TouchableOpacity
+        style={GlobalStyles.primaryButton}
+        onPress={() =>
+          navigation.navigate("AdicionarCultura", {
+            propriedadeID: property.id,
+          })
+        }
+      >
+        <Text style={GlobalStyles.textButton}>Adicionar Cultivo</Text>
+      </TouchableOpacity>
+    
+    </View>
     );
   };
 
@@ -185,7 +201,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 5,
     borderColor: palette.primaryGreen,
-    marginVertical: 10,
+    marginVertical: 20,
     marginBottom: 20,
   },
   iconRow: {

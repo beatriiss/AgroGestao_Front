@@ -13,10 +13,10 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // Importe o Picker
+import { Picker } from "@react-native-picker/picker";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
-import { url } from "../../config/url"; // Certifique-se de ter a URL do backend configurada aqui
+import { url } from "../../config/url";
 import GlobalStyles from "../../styles/global";
 import Header from "../../components/Header";
 import moment from "moment-timezone";
@@ -34,12 +34,13 @@ const especiesComuns = [
 
 const AdicionarCultura = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const { currentUser } = useAuth(); // Para obter informações do usuário logado, se necessário
+  const { currentUser } = useAuth();
   const [cultura, setCultura] = useState("");
   const [dataPlantio, setDataPlantio] = useState("");
   const [areaPlantada, setAreaPlantada] = useState("");
   const [nome, setNome] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [isDateValid, setIsDateValid] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -61,23 +62,61 @@ const AdicionarCultura = ({ navigation, route }) => {
     };
   }, []);
 
-  const propriedadeID = route.params.propriedadeID; // ID da propriedade passada via route
+  const propriedadeID = route.params.propriedadeID;
+
+  const formatDateString = (text) => {
+    const cleaned = text.replace(/\D/g, "");
+    let formatted = cleaned;
+
+    if (cleaned.length > 2) {
+      formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
+    }
+    if (cleaned.length > 4) {
+      formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4)}`;
+    }
+
+    setDataPlantio(formatted);
+  };
+
+  const validateAndSetDate = (text) => {
+    formatDateString(text);
+    const date = moment(text, "DD/MM/YYYY", true);
+    if (date.isValid()) {
+      setIsDateValid(true);
+    } else {
+      setIsDateValid(false);
+    }
+  };
 
   const handleSubmit = async () => {
-    if (!cultura || !areaPlantada || !dataPlantio|| !nome) {
+    if (!cultura || !areaPlantada || !dataPlantio || !nome) {
       showFlashMessage("Todos os campos são obrigatórios.", "danger");
       return;
     }
 
-    try {
-        console.log(cultura, areaPlantada, dataPlantio, nome)
+    if (!isDateValid) {
+      showFlashMessage("Data inválida. Use o formato DD/MM/YYYY.", "danger");
+      return;
+    }
 
+    const formattedDate = moment(dataPlantio, "DD/MM/YYYY").format("YYYY-MM-DD");
+
+    try {
+      const response = await axios.post(`${url}/cultivations/`, {
+        tipo: cultura,
+        area_plantada: areaPlantada,
+        propriedade_id: propriedadeID,
+        data_plantio: formattedDate,
+        data_criacao: moment().format("YYYY-MM-DD HH:mm:ss"),
+        nome,
+      });
+      if (response.status === 201) {
+        showFlashMessage("Cultura adicionada com sucesso!", "success");
+        navigation.goBack();
+      }
     } catch (error) {
-      console.error("Erro ao adicionar criação:", error);
-      showFlashMessage(
-        "Ocorreu um erro. Por favor, tente novamente.",
-        "danger"
-      );
+      console.error("Erro ao adicionar cultura:", error);
+      showFlashMessage("Ocorreu um erro. Por favor, tente novamente.", "danger");
     }
   };
 
@@ -87,7 +126,6 @@ const AdicionarCultura = ({ navigation, route }) => {
       style={{ flex: 1 }}
     >
       <Header screenName="Adicionar Cultura" />
-
       <View style={styles.container}>
         {!keyboardVisible && (
           <Image
@@ -105,60 +143,44 @@ const AdicionarCultura = ({ navigation, route }) => {
             >
               <Picker.Item label="Selecione uma cultura" value="" />
               {especiesComuns.map((item) => (
-                <Picker.Item
-                  key={item.value}
-                  label={item.label}
-                  value={item.value}
-                />
+                <Picker.Item key={item.value} label={item.label} value={item.value} />
               ))}
             </Picker>
           </View>
-          <Text style={styles.label}>Nome da criação</Text>
+          <Text style={styles.label}>Nome da cultura</Text>
           <TextInput
             style={GlobalStyles.input}
             placeholder="Digite o nome da cultura"
-            keyboardType="text"
+            keyboardType="default"
             value={nome}
-            onChangeText={(text) => setNome(text)}
+            onChangeText={setNome}
           />
-
           <Text style={styles.label}>Data Plantio</Text>
           <TextInput
             style={GlobalStyles.input}
-            placeholder="Digite o número de animais"
-            keyboardType="numeric"
+            placeholder="DD/MM/YYYY"
+            keyboardType="numeric" // Muda para numérico
             value={dataPlantio}
-            onChangeText={(text) => setDataPlantio(text)}
+            onChangeText={validateAndSetDate}
+            editable={!isDateValid} // Desabilita o campo se a data for válida
           />
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
+          <View style={styles.areaContainer}>
             <Text style={styles.label}>Área plantada (em tarefas)</Text>
             <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
               <AntDesign name="questioncircle" size={24} color="gray" />
             </TouchableOpacity>
             <Modal
               animationType="slide"
-              transparent={true} // Isso garante que o fundo do modal seja visível
+              transparent={true}
               visible={modalVisible}
-              onRequestClose={() => {
-                Alert.alert("Modal has been closed.");
-                setModalVisible(!modalVisible);
-              }}
+              onRequestClose={() => setModalVisible(!modalVisible)}
             >
               <View style={styles.modalBackground}>
                 <View style={styles.centeredView}>
                   <View style={styles.modalView}>
                     <Text style={styles.modalText}>
-                    A tarefa é uma medida utilizada principalmente na região Nordeste do Brasil. Seu valor pode variar entre 2.500 e 3.000 metros quadrados. Essa medida tem influências históricas e culturais da colonização portuguesa, sendo utilizada para medir áreas rurais e propriedades agrícolas na região
+                      A tarefa é uma medida utilizada principalmente na região Nordeste do Brasil. Seu valor pode variar entre 2.500 e 3.000 metros quadrados.
                     </Text>
-
                     <Pressable
                       style={[styles.button, styles.buttonClose]}
                       onPress={() => setModalVisible(!modalVisible)}
@@ -170,19 +192,18 @@ const AdicionarCultura = ({ navigation, route }) => {
               </View>
             </Modal>
           </View>
-
           <TextInput
             style={GlobalStyles.input}
-            placeholder="Digite o peso médio"
+            placeholder="Digite a área plantada"
             keyboardType="numeric"
             value={areaPlantada}
-            onChangeText={(text) => setAreaPlantada(text)}
+            onChangeText={setAreaPlantada}
           />
           <TouchableOpacity
             style={[GlobalStyles.primaryButton, { marginTop: 20 }]}
             onPress={handleSubmit}
           >
-            <Text style={GlobalStyles.textButton}>Adicionar Criação</Text>
+            <Text style={GlobalStyles.textButton}>Adicionar Cultura</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -194,7 +215,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -203,7 +223,6 @@ const styles = StyleSheet.create({
     height: 250,
     marginTop: -50,
   },
-
   label: {
     fontSize: 16,
     fontWeight: "bold",
@@ -218,12 +237,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     color: "#000",
     justifyContent: "center",
-    display: "flex",
     alignItems: "flex-start",
   },
   picker: {
     width: "100%",
-    marginLeft: -20,
+    marginLeft: -10,
+  },
+  areaContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
   },
   input: {
     borderWidth: 1,
@@ -240,13 +264,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   form: {
-    display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
     width: "100%",
@@ -267,11 +285,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginHorizontal: 20,
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
   buttonClose: {
     backgroundColor: palette.secondaryGreen,
     borderRadius: 5,
@@ -290,9 +303,9 @@ const styles = StyleSheet.create({
   },
   modalBackground: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fundo escuro com opacidade
-    justifyContent: "center", // Centralizar o modal
-    alignItems: "center", // Centralizar o modal
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   centeredView: {
     justifyContent: "center",
