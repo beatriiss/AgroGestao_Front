@@ -3,7 +3,7 @@ import { url } from '../../config/url';
 
 export const getCultivationDetails = async (id) => {
   try {
-    const response = await axios.get(`${url}/cultivation/${id}`);
+    const response = await axios.get(`${url}/cultivations/${id}`);
     return response.data; // Retorna os dados da resposta da API
   } catch (error) {
     // Lida com erros e pode retornar uma mensagem ou lançar um erro

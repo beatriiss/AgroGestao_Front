@@ -4,7 +4,7 @@ import { showFlashMessage } from "../../components/Message";
 
 export const updateCultivation = async (id, cultivationData) => {
   try {
-    const response = await axios.put(`${url}/cultivation/${id}`, cultivationData);
+    const response = await axios.put(`${url}/cultivations/${id}`, cultivationData);
     showFlashMessage('Cultivo editado com sucesso!', 'success');
     return response.data; // Retorna os dados da resposta da API
   } catch (error) {

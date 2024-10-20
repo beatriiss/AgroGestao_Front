@@ -8,7 +8,7 @@ import {
   Platform,
   FlatList,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native"; 
+import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { getCultivationDetails } from "../../utils/requests/getCultivationDetails";
 import Header from "../../components/Header";
@@ -16,7 +16,7 @@ import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Octicons from '@expo/vector-icons/Octicons';
-import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
 
 import moment from "moment";
 const DetalheCultura = ({ navigation, route }) => {
@@ -33,7 +33,7 @@ const DetalheCultura = ({ navigation, route }) => {
 
   const fetchPropertie = async () => {
     try {
-      console.log("ID:::", route?.params?.CriacaoID);
+      console.log("ID:::", route?.params?.CultivoID);
       setCultivation(await getCultivationDetails(route?.params?.CultivoID));
       // TODO: Fetch bioinsumos and informacoes data here
       // setBioinsumos(await fetchBioinsumos(route?.params?.CriacaoID));
@@ -72,7 +72,7 @@ const DetalheCultura = ({ navigation, route }) => {
     }
 
     return (
-      <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
+      <View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
         <FlatList
           data={bioinsumos}
           keyExtractor={(item) => item.id.toString()}
@@ -103,7 +103,7 @@ const DetalheCultura = ({ navigation, route }) => {
     }
 
     return (
-      <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
+      <View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
         <FlatList
           data={informacoes}
           keyExtractor={(item) => item.id.toString()}
@@ -128,15 +128,26 @@ const DetalheCultura = ({ navigation, route }) => {
       <Header screenName={cultivation?.nome} />
       <View style={styles.container}>
         <View style={styles.dados}>
-          <Text style={styles.title}>{cultivation?.tipo}</Text>
-          <View style={styles.iconRow}>
-            <Text style={styles.text}>Area Plantada: {cultivation?.area_plantada} tarefas</Text>
-            <TouchableOpacity>
-            <FontAwesome name="area-chart" size={24} color="black" />
+          <View style={styles.edit}>
+            <Text style={styles.title}>{cultivation?.tipo}</Text>
+            <TouchableOpacity style={styles.editIcon}
+              onPress={() =>
+                navigation.navigate("AdicionarCultura", {
+                  cultivoID: cultivation.id,
+                })
+              }
+            >
+              <FontAwesome5 name="edit" size={24} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.iconRow}>
-            <Text style={styles.text}>Data de plantio: {moment(cultivation.data_plantio).format("DD/MM/YYYY")}</Text>
+            <Text style={styles.text}>Area Plantada: {cultivation?.area_plantada} tarefas</Text>
+            <TouchableOpacity>
+              <FontAwesome name="area-chart" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.iconRow}>
+            <Text style={styles.text}>Data de plantio: {cultivation ? moment(cultivation.data_plantio).format("DD/MM/YYYY") : "sem data"}</Text>
             <TouchableOpacity>
               <FontAwesome6 name="calendar" size={24} color="black" />
             </TouchableOpacity>
@@ -152,7 +163,7 @@ const DetalheCultura = ({ navigation, route }) => {
             <TabBar
               {...props}
               indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-              style={{ backgroundColor: '#f1f1f1', marginBottom:20, decoration:'none', elevation:0 }}
+              style={{ backgroundColor: '#f1f1f1', marginBottom: 20, decoration: 'none', elevation: 0 }}
               labelStyle={{ color: palette.highlightGreen, fontSize: 16 }}
             />
           )}
@@ -186,6 +197,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
     color: palette.highlightGreen,
+  },
+  edit: {
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   text: {
     fontSize: 20,

@@ -44,7 +44,7 @@ const AdicionarCultura = ({ navigation, route }) => {
   const [areaPlantada, setAreaPlantada] = useState("");
   const [nome, setNome] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [isDateValid, setIsDateValid] = useState(false);
+  const [isDateValid, setIsDateValid] = useState(cultivoID !== null);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -69,9 +69,9 @@ const AdicionarCultura = ({ navigation, route }) => {
     const fetchCultivation = async () => {
       if (cultivoID != null) {
         try {
-          const cultivationDetails = await getCultivationDetails(criacaoID);
+          const cultivationDetails = await getCultivationDetails(cultivoID);
           setCultura(cultivationDetails.tipo);
-          setDataPlantio(cultivationDetails.data_plantio.toString());
+          setDataPlantio(moment(cultivationDetails.data_plantio).format("DD/MM/YYYY"));
           setAreaPlantada(cultivationDetails.area_plantada.toString());
           setNome(cultivationDetails.nome);
         } catch (error) {
