@@ -8,6 +8,7 @@ export const getCreationsDetails = async (id) => {
   } catch (error) {
     // Lida com erros e pode retornar uma mensagem ou lançar um erro
     if (error.response) {
+      console.log("response", error.response)
       // O servidor respondeu com um status diferente de 2xx
       console.error('Erro de resposta:', error);
     } else if (error.request) {
