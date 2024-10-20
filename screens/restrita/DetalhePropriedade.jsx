@@ -8,7 +8,7 @@ import {
   Platform,
   FlatList,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native"; 
+import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { getPropertyDetails } from "../../utils/requests/getPropertyDetails";
 import { getPropertyCreations } from "../../utils/requests/getPropertyCreations";
@@ -73,14 +73,14 @@ const DetalhesPropriedade = ({ navigation, route }) => {
     }
 
     return (
-      <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
-     
+      <View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
+
         <FlatList
           data={creations}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => <CardCriacoes item={item} />}
           overScrollMode="never"
-          
+
         />
         <TouchableOpacity
           style={GlobalStyles.primaryButton}
@@ -92,7 +92,7 @@ const DetalhesPropriedade = ({ navigation, route }) => {
         >
           <Text style={GlobalStyles.textButton}>Adicionar Criação</Text>
         </TouchableOpacity>
-      
+
       </View>
     );
   };
@@ -117,14 +117,14 @@ const DetalhesPropriedade = ({ navigation, route }) => {
     }
 
     // Exemplo: Lista de culturas
-    return ( <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
-     
+    return (<View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
+
       <FlatList
         data={cultures}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <CardCultivos item={item} />}
         overScrollMode="never"
-        
+
       />
       <TouchableOpacity
         style={GlobalStyles.primaryButton}
@@ -136,7 +136,7 @@ const DetalhesPropriedade = ({ navigation, route }) => {
       >
         <Text style={GlobalStyles.textButton}>Adicionar Cultivo</Text>
       </TouchableOpacity>
-    
+
     </View>
     );
   };
@@ -156,9 +156,20 @@ const DetalhesPropriedade = ({ navigation, route }) => {
       <Header screenName={"Detalhe da Propriedade"} />
       <View style={styles.container}>
         <View style={styles.dados}>
-          <Text style={styles.title}>{property?.nome}</Text>
+          <View style={styles.edit}>
+            <Text style={styles.title}>{property?.nome}</Text>
+            <TouchableOpacity style={styles.editIcon}
+              onPress={() =>
+                navigation.navigate("AdicionarPropriedade", {
+                  propriedadeID: property.id,
+                })
+              }
+            >
+              <FontAwesome5 name="edit" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
           <View style={styles.iconRow}>
-            <Text style={styles.text}>Localização: {property?.localizacao}</Text>
+            <Text style={styles.text}>Localização: {"\n"}{property?.localizacao}</Text>
             <TouchableOpacity>
               <FontAwesome5 name="map-marked-alt" size={24} color="black" />
             </TouchableOpacity>
@@ -181,7 +192,7 @@ const DetalhesPropriedade = ({ navigation, route }) => {
             <TabBar
               {...props}
               indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-              style={{ backgroundColor: '#f1f1f1', marginBottom:20, decoration:'none', elevation:0 }}
+              style={{ backgroundColor: '#f1f1f1', marginBottom: 20, decoration: 'none', elevation: 0 }}
               labelStyle={{ color: palette.highlightGreen, fontSize: 16 }}
             />
           )}
@@ -211,6 +222,11 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 10,
   },
+  edit: {
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   title: {
     fontSize: 22,
     fontWeight: "600",
@@ -218,6 +234,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+    width: "90%",
   },
   emptyContainer: {
     alignItems: "center",

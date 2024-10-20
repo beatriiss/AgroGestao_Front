@@ -23,6 +23,8 @@ import moment from "moment-timezone";
 import palette from "../../styles/palette";
 import { showFlashMessage } from "../../components/Message";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { getCultivationDetails } from "../../utils/requests/getCultivationDetails";
+import { updateCultivation } from "../../utils/requests/updateCultivation";
 
 const especiesComuns = [
   { label: "Milho", value: "Milho" },
@@ -32,7 +34,9 @@ const especiesComuns = [
   { label: "Laranja", value: "Laranja" },
 ];
 
-const AdicionarCultura = ({ navigation, route }) => {
+const AdicionarCultura = ({ navigation, route }) => { 
+  const { propriedadeID = null, cultivoID = null } = route?.params || {};
+
   const [modalVisible, setModalVisible] = useState(false);
   const { currentUser } = useAuth();
   const [cultura, setCultura] = useState("");
@@ -61,8 +65,23 @@ const AdicionarCultura = ({ navigation, route }) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+  useEffect(() => {
+    const fetchCultivation = async () => {
+      if (cultivoID != null) {
+        try {
+          const cultivationDetails = await getCultivationDetails(criacaoID);
+          setCultura(cultivationDetails.tipo);
+          setDataPlantio(cultivationDetails.data_plantio.toString());
+          setAreaPlantada(cultivationDetails.area_plantada.toString());
+          setNome(cultivationDetails.nome);
+        } catch (error) {
+          console.error("Error fetching property details:", error);
+        }
+      }
+    };
 
-  const propriedadeID = route.params.propriedadeID;
+    fetchCultivation();
+  }, []);
 
   const formatDateString = (text) => {
     const cleaned = text.replace(/\D/g, "");
@@ -119,13 +138,40 @@ const AdicionarCultura = ({ navigation, route }) => {
       showFlashMessage("Ocorreu um erro. Por favor, tente novamente.", "danger");
     }
   };
+  const handleEdit = async () => {
+    if (!cultura || !areaPlantada || !dataPlantio || !nome) {
+      showFlashMessage("Todos os campos são obrigatórios.", "danger");
+      return;
+    }
+
+    if (!isDateValid) {
+      showFlashMessage("Data inválida. Use o formato DD/MM/YYYY.", "danger");
+      return;
+    }
+
+    const formattedDate = moment(dataPlantio, "DD/MM/YYYY").format("YYYY-MM-DD");
+
+    try {
+      const cultivationData = {
+        tipo: cultura,
+        area_plantada: areaPlantada,
+        data_plantio: formattedDate,
+        nome,        
+      }
+      const response = await updateCultivation(cultivoID, cultivationData);
+      navigation.goBack(); // Voltar para a tela anterior após editar
+    } catch (error) {
+      console.error("Erro ao adicionar cultura:", error);
+      showFlashMessage("Ocorreu um erro. Por favor, tente novamente.", "danger");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <Header screenName="Adicionar Cultura" />
+      <Header screenName={cultivoID === null ? "Adicionar Cultura" : "Editar Cultura"} />
       <View style={styles.container}>
         {!keyboardVisible && (
           <Image
@@ -201,9 +247,9 @@ const AdicionarCultura = ({ navigation, route }) => {
           />
           <TouchableOpacity
             style={[GlobalStyles.primaryButton, { marginTop: 20 }]}
-            onPress={handleSubmit}
+            onPress={cultivoID === null ? handleSubmit : handleEdit}
           >
-            <Text style={GlobalStyles.textButton}>Adicionar Cultura</Text>
+            <Text style={GlobalStyles.textButton}>{cultivoID === null ? "Adicionar Cultivo" : "Editar Cultivo"}</Text>
           </TouchableOpacity>
         </View>
       </View>

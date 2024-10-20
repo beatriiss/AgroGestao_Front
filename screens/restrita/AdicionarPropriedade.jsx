@@ -17,8 +17,13 @@ import Header from "../../components/Header";
 import GlobalStyles from "../../styles/global";
 import { createProperty } from "../../utils/requests/createProperty";
 import { showFlashMessage } from "../../components/Message";
+import { getPropertyDetails } from "../../utils/requests/getPropertyDetails";
+import { updateProperty } from "../../utils/requests/updateProperty";
+import palette from "../../styles/palette";
 
-const AdicionarPropriedade = ({ navigation }) => {
+const AdicionarPropriedade = ({ navigation, route }) => {
+  const { propriedadeID = null } = route?.params || {};
+
   const [ident, setIdent] = useState("");
   const [area, setArea] = useState("");
   const [local, setLocal] = useState("");
@@ -44,6 +49,24 @@ const AdicionarPropriedade = ({ navigation }) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+  useEffect(() => {
+    const fetchPropertyDetails = async () => {
+      if (propriedadeID != null) {
+        try {
+          const propertyDetails = await getPropertyDetails(propriedadeID);
+          setIdent(propertyDetails.nome); 
+          setArea(propertyDetails.area_total);
+          setLocal(propertyDetails.localizacao);
+        } catch (error) {
+          console.error("Error fetching property details:", error);
+        }
+      }
+    };
+
+    fetchPropertyDetails();
+  }, []);
+
+
 
   const handlePropRegister = async () => {
     if (ident && area && local && currentUser) {
@@ -66,6 +89,26 @@ const AdicionarPropriedade = ({ navigation }) => {
       showFlashMessage("Preeencha os dados corretamente!", "danger");
     }
   };
+  const handlePropEdit = async () => {
+    if (ident && area && local && currentUser) {
+      try {
+        const propertyData = {
+          nome: ident,
+          localizacao: local,
+          area_total: area,
+          usuario_id: currentUser.id,
+        };
+        const response = await updateProperty(propriedadeID, propertyData);
+        showFlashMessage("Propriedade atualizada com sucesso!", "success");
+        navigation.goBack(); // Voltar para a tela anterior após adicionar
+      } catch (error) {
+        console.log("erro cadastrando a propriedade");
+      }
+    } else {
+      console.log("Dados incorretos");
+      showFlashMessage("Preeencha os dados corretamente!", "danger");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -73,7 +116,7 @@ const AdicionarPropriedade = ({ navigation }) => {
       keyboardVerticalOffset={0} // Ajuste para compensar a altura do teclado
       style={{ flex: 1 }}
     >
-      <Header screenName={"Adicionar Propriedade"} />
+      {propriedadeID === null ? <Header screenName={"Adicionar Propriedade"} /> : <Header screenName={"Editar Propriedade"} />}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
           {!keyboardVisible && (
@@ -84,12 +127,14 @@ const AdicionarPropriedade = ({ navigation }) => {
           )}
 
           <View style={[styles.form, keyboardVisible && { marginTop: -180 }]}>
+            {propriedadeID !== null && <Text style={styles.text}>Identificação</Text>}
             <TextInput
               placeholder="Identificação"
               value={ident}
               onChangeText={setIdent}
               style={[GlobalStyles.input, styles.input]}
             />
+            {propriedadeID !== null && <Text style={styles.text}>Area Total (em tarefas)</Text>}
             <TextInput
               placeholder="Area Total (em tarefas)"
               inputMode="numeric"
@@ -97,6 +142,7 @@ const AdicionarPropriedade = ({ navigation }) => {
               onChangeText={setArea}
               style={[GlobalStyles.input, styles.input]}
             />
+            {propriedadeID !== null && <Text style={styles.text}>Localização</Text>}
             <TextInput
               placeholder="Localização"
               multiline
@@ -107,9 +153,9 @@ const AdicionarPropriedade = ({ navigation }) => {
 
             <TouchableOpacity
               style={GlobalStyles.primaryButton}
-              onPress={handlePropRegister}
+              onPress={propriedadeID === null ? handlePropRegister : handlePropEdit}
             >
-              <Text style={GlobalStyles.textButton}>Cadastrar Propiedade</Text>
+              <Text style={GlobalStyles.textButton}>{propriedadeID === null ? "Cadastrar Propiedade" : "Editar Propriedade"}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -148,6 +194,12 @@ const styles = StyleSheet.create({
 
   local: {
     height: 100,
+  },
+
+  text: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: palette.highlightGreen,
   },
 });
 

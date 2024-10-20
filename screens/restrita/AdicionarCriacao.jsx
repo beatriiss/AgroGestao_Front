@@ -23,6 +23,8 @@ import moment from "moment-timezone";
 import palette from "../../styles/palette";
 import { showFlashMessage } from "../../components/Message";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { getCreationsDetails } from "../../utils/requests/getCriationDetails";
+import { updateCreation } from "../../utils/requests/updateCreation";
 
 const especiesComuns = [
   { label: "Gado", value: "Gado" },
@@ -35,6 +37,8 @@ const especiesComuns = [
 ];
 
 const AdicionarCriacao = ({ navigation, route }) => {
+  const { propriedadeID = null, criacaoID = null } = route?.params || {};
+
   const [modalVisible, setModalVisible] = useState(false);
   const { currentUser } = useAuth(); // Para obter informações do usuário logado, se necessário
   const [especie, setEspecie] = useState("");
@@ -62,11 +66,26 @@ const AdicionarCriacao = ({ navigation, route }) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+  useEffect(() => {
+    const fetchCreation = async () => {
+      if (criacaoID != null) {
+        try {
+          const creationDetails = await getCreationsDetails(criacaoID);
+          setEspecie(creationDetails.especie);
+          setNumeroAnimais(creationDetails.numero_animais.toString());
+          setPesoMedio(creationDetails.peso_medio.toString());
+          setNome(creationDetails.nome);
+        } catch (error) {
+          console.error("Error fetching property details:", error);
+        }
+      }
+    };
 
-  const propriedadeID = route.params.propriedadeID; // ID da propriedade passada via route
+    fetchCreation();
+  }, []);
 
   const handleSubmit = async () => {
-    if (!especie || !numeroAnimais || !pesoMedio) {
+    if (!especie || !numeroAnimais || !pesoMedio || !nome) {
       showFlashMessage("Todos os campos são obrigatórios.", "danger")
       return;
     }
@@ -91,13 +110,33 @@ const AdicionarCriacao = ({ navigation, route }) => {
       );
     }
   };
+  const handleEdit = async () => {
+    if (!especie || !numeroAnimais || !pesoMedio || !nome) {
+      showFlashMessage("Todos os campos são obrigatórios.", "danger")
+      return;
+    }
+    try {
+      const creationData = {
+        especie,
+        numero_animais: parseInt(numeroAnimais),
+        peso_medio: parseFloat(pesoMedio),
+        nome,
+        id: criacaoID,
+      }
+      const response = await updateCreation(criacaoID, creationData);
+      navigation.goBack(); // Voltar para a tela anterior após editar
+    } catch (error) {
+      console.error("Erro ao adicionar criação:", error);
+      showFlashMessage("Ocorreu um erro. Por favor, tente novamente.", "danger");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <Header screenName="Adicionar Criação" />
+      <Header screenName={criacaoID === null ? "Adicionar Criação" : "Editar Criação"} />
 
       <View style={styles.container}>
         {!keyboardVisible && (
@@ -106,7 +145,7 @@ const AdicionarCriacao = ({ navigation, route }) => {
             source={require("../../assets/logo.png")}
           />
         )}
-        <View style={[styles.form, keyboardVisible &&{marginTop:-40}]}>
+        <View style={[styles.form, keyboardVisible && { marginTop: -40 }]}>
           <Text style={styles.label}>Espécie</Text>
           <View style={styles.pickerContainer}>
             <Picker
@@ -155,37 +194,37 @@ const AdicionarCriacao = ({ navigation, route }) => {
               <AntDesign name="questioncircle" size={24} color="gray" />
             </TouchableOpacity>
             <Modal
-  animationType="slide"
-  transparent={true} // Isso garante que o fundo do modal seja visível
-  visible={modalVisible}
-  onRequestClose={() => {
-    Alert.alert("Modal has been closed.");
-    setModalVisible(!modalVisible);
-  }}
->
-  <View style={styles.modalBackground}> 
-    <View style={styles.centeredView}>
-      <View style={styles.modalView}>
-        <Text style={styles.modalText}>
-          A arroba é uma unidade de peso utilizada no Brasil para
-          medir a massa dos bovinos. Ela equivale a 14,688 quilogramas
-          (kg), que são arredondados para 15 kg, facilitando assim as
-          contas.
-        </Text>
-        <Text style={styles.modalText}>
-          Dessa forma: 1 arroba = 15kg
-        </Text>
+              animationType="slide"
+              transparent={true} // Isso garante que o fundo do modal seja visível
+              visible={modalVisible}
+              onRequestClose={() => {
+                Alert.alert("Modal has been closed.");
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <View style={styles.modalBackground}>
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <Text style={styles.modalText}>
+                      A arroba é uma unidade de peso utilizada no Brasil para
+                      medir a massa dos bovinos. Ela equivale a 14,688 quilogramas
+                      (kg), que são arredondados para 15 kg, facilitando assim as
+                      contas.
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Dessa forma: 1 arroba = 15kg
+                    </Text>
 
-        <Pressable
-          style={[styles.button, styles.buttonClose]}
-          onPress={() => setModalVisible(!modalVisible)}
-        >
-          <Text style={styles.textStyle}>Fechar</Text>
-        </Pressable>
-      </View>
-    </View>
-  </View>
-</Modal>
+                    <Pressable
+                      style={[styles.button, styles.buttonClose]}
+                      onPress={() => setModalVisible(!modalVisible)}
+                    >
+                      <Text style={styles.textStyle}>Fechar</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+            </Modal>
           </View>
 
           <TextInput
@@ -197,9 +236,9 @@ const AdicionarCriacao = ({ navigation, route }) => {
           />
           <TouchableOpacity
             style={[GlobalStyles.primaryButton, { marginTop: 20 }]}
-            onPress={handleSubmit}
+            onPress={criacaoID === null ? handleSubmit : handleEdit}
           >
-            <Text style={GlobalStyles.textButton}>Adicionar Criação</Text>
+            <Text style={GlobalStyles.textButton}>{criacaoID === null ? "Adicionar Criação" : "Editar Criação"}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -292,7 +331,7 @@ const styles = StyleSheet.create({
   buttonClose: {
     backgroundColor: palette.secondaryGreen,
     borderRadius: 5,
-    marginTop:20,
+    marginTop: 20,
     paddingVertical: 10,
     paddingHorizontal: 35,
   },

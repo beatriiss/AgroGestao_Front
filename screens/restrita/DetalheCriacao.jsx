@@ -8,7 +8,7 @@ import {
   Platform,
   FlatList,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native"; 
+import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { getCreationsDetails } from "../../utils/requests/getCriationDetails";
 import Header from "../../components/Header";
@@ -16,7 +16,7 @@ import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Octicons from '@expo/vector-icons/Octicons';
-import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome6, FontAwesome5 } from "@expo/vector-icons";
 const DetalheCriacao = ({ navigation, route }) => {
   const [creation, setCreation] = useState(null);
   const [vaccines, setVaccines] = useState([]); // Vacinas
@@ -70,7 +70,7 @@ const DetalheCriacao = ({ navigation, route }) => {
     }
 
     return (
-      <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
+      <View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
         <FlatList
           data={vaccines}
           keyExtractor={(item) => item.id.toString()}
@@ -101,7 +101,7 @@ const DetalheCriacao = ({ navigation, route }) => {
     }
 
     return (
-      <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
+      <View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
         <FlatList
           data={history}
           keyExtractor={(item) => item.id.toString()}
@@ -126,7 +126,18 @@ const DetalheCriacao = ({ navigation, route }) => {
       <Header screenName={creation?.nome} />
       <View style={styles.container}>
         <View style={styles.dados}>
-          <Text style={styles.title}>{creation?.especie}</Text>
+          <View style={styles.edit}>
+            <Text style={styles.title}>{creation?.especie}</Text>
+            <TouchableOpacity style={styles.editIcon}
+              onPress={() =>
+                navigation.navigate("AdicionarCriacao", {
+                  criacaoID: creation.id,
+                })
+              }
+            >
+              <FontAwesome5 name="edit" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
           <View style={styles.iconRow}>
             <Text style={styles.text}>Quantidade de animais: {creation?.numero_animais}</Text>
             <TouchableOpacity>
@@ -150,7 +161,7 @@ const DetalheCriacao = ({ navigation, route }) => {
             <TabBar
               {...props}
               indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-              style={{ backgroundColor: '#f1f1f1', marginBottom:20, decoration:'none', elevation:0 }}
+              style={{ backgroundColor: '#f1f1f1', marginBottom: 20, decoration: 'none', elevation: 0 }}
               labelStyle={{ color: palette.highlightGreen, fontSize: 16 }}
             />
           )}
@@ -184,6 +195,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
     color: palette.highlightGreen,
+  },
+  edit: {
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   text: {
     fontSize: 20,
