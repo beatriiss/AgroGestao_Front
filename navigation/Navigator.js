@@ -19,6 +19,8 @@ import DetalhePropriedade from './../screens/restrita/DetalhePropriedade';
 import AdicionarCriacao from "../screens/restrita/AdicionarCriacao";
 import AdicionarCultura from "../screens/restrita/AdicionalCultura";
 import DetalheCriacao from "../screens/restrita/DetalheCriacao";
+import DetalheCultura from "../screens/restrita/DetalheCultura";
+import AdicionarVacina from "../screens/restrita/AdicionarVacina";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -160,6 +162,8 @@ const AppNavigator = () => {
         <Stack.Screen name="AdicionarCriacao" component={AdicionarCriacao} />
         <Stack.Screen name="AdicionarCultura" component={AdicionarCultura} />
         <Stack.Screen name="DetalheCriacao" component={DetalheCriacao} />
+        <Stack.Screen name="DetalheCultura" component={DetalheCultura} />
+        <Stack.Screen name="AdicionarVacina" component={AdicionarVacina} />
         </>
       ) : (
         <>

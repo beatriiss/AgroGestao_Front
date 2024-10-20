@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import palette from "../styles/palette";
 import moment from "moment";
+import { TouchableOpacity } from "react-native";
 const especiesComuns = {
   Abóbora: require("../assets/cultivos/abobora.png"),
   Aipim: require("../assets/cultivos/aipim.png"),
@@ -22,7 +23,7 @@ const CardCriacoes = ({ item }) => {
   const imageSource = especiesComuns[item.tipo];
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity onPress={()=> navigation.navigate("DetalheCultura", {CultivoID: item.id})} style={styles.card}>
       <View style={styles.leftContent}>
       <Text style={styles.text}>Nome: {item.nome}</Text>
         <Text style={styles.text}>Area Plantio: {item.area_plantada} tarefas</Text>
@@ -38,7 +39,7 @@ const CardCriacoes = ({ item }) => {
           />
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

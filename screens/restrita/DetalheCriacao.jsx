@@ -17,6 +17,8 @@ import GlobalStyles from "../../styles/global";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Octicons from '@expo/vector-icons/Octicons';
 import { FontAwesome6 } from "@expo/vector-icons";
+import CardVacina from "../../components/cardVacinas";
+import { buscarVacinas } from "../../utils/requests/buscarVacinas";
 const DetalheCriacao = ({ navigation, route }) => {
   const [creation, setCreation] = useState(null);
   const [vaccines, setVaccines] = useState([]); // Vacinas
@@ -34,7 +36,8 @@ const DetalheCriacao = ({ navigation, route }) => {
       console.log("ID:::", route?.params?.CriacaoID);
       setCreation(await getCreationsDetails(route?.params?.CriacaoID));
       // TODO: Fetch vaccines and history data here
-      // setVaccines(await fetchVaccines(route?.params?.CriacaoID));
+      setVaccines(await buscarVacinas(route?.params?.CriacaoID));
+
       // setHistory(await fetchHistory(route?.params?.CriacaoID));
     } catch (error) {
       console.error("Erro ao buscar a dados da criacao:", error);
@@ -74,14 +77,14 @@ const DetalheCriacao = ({ navigation, route }) => {
         <FlatList
           data={vaccines}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CardVacinas item={item} />} // Update this to your actual component
+          renderItem={({ item }) => <CardVacina vacina={item} onDelete={fetchPropertie}/>} // Update this to your actual component
           overScrollMode="never"
         />
         <TouchableOpacity
           style={GlobalStyles.primaryButton}
           onPress={() =>
             navigation.navigate("AdicionarVacina", {
-              criationID: creation.id,
+              creationID: creation.id,
             })
           }
         >

@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { url } from '../../config/url';
 
-export const getCreationsDetails = async (id) => {
+export const getCultivationDetails = async (id) => {
+    console.log("Cheou ca")
   try {
-    const response = await axios.get(`${url}/creations/${id}`);
+    const response = await axios.get(`${url}/cultivations/${id}`);
     return response.data; // Retorna os dados da resposta da API
   } catch (error) {
     // Lida com erros e pode retornar uma mensagem ou lançar um erro

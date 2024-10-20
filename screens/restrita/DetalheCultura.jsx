@@ -10,33 +10,34 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native"; 
 import { useAuth } from "../../context/AuthContext";
-import { getCreationsDetails } from "../../utils/requests/getCriationDetails";
+import { getCultivationDetails } from "../../utils/requests/getCultivationDetails";
 import Header from "../../components/Header";
 import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Octicons from '@expo/vector-icons/Octicons';
-import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 
+import moment from "moment";
 const DetalheCultura = ({ navigation, route }) => {
-  const [creation, setCreation] = useState(null);
-  const [vaccines, setVaccines] = useState([]); // Vacinas
-  const [history, setHistory] = useState([]); // Histórico
+  const [cultivation, setCultivation] = useState(null);
+  const [bioinsumos, setBioinsumos] = useState([]); // Bioinsumos
+  const [informacoes, setInformacoes] = useState([]); // Informações
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'vaccines', title: 'Vacinas' },
-    { key: 'history', title: 'Histórico' },
+    { key: 'bioinsumos', title: 'Bioinsumos' },
+    { key: 'informacoes', title: 'Informações' },
   ]);
 
   const fetchPropertie = async () => {
     try {
       console.log("ID:::", route?.params?.CriacaoID);
-      setCreation(await getCreationsDetails(route?.params?.CriacaoID));
-      // TODO: Fetch vaccines and history data here
-      // setVaccines(await fetchVaccines(route?.params?.CriacaoID));
-      // setHistory(await fetchHistory(route?.params?.CriacaoID));
+      setCultivation(await getCultivationDetails(route?.params?.CultivoID));
+      // TODO: Fetch bioinsumos and informacoes data here
+      // setBioinsumos(await fetchBioinsumos(route?.params?.CriacaoID));
+      // setInformacoes(await fetchInformacoes(route?.params?.CriacaoID));
     } catch (error) {
       console.error("Erro ao buscar a dados da criacao:", error);
     } finally {
@@ -51,20 +52,20 @@ const DetalheCultura = ({ navigation, route }) => {
     }, [currentUser.id])
   );
 
-  const renderVacinas = () => {
-    if (!vaccines || vaccines.length === 0) {
+  const renderBioinsumos = () => {
+    if (!bioinsumos || bioinsumos.length === 0) {
       return (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Nenhuma vacina cadastrada.</Text>
+          <Text style={styles.emptyText}>Nenhum bioinsumo cadastrado.</Text>
           <TouchableOpacity
             style={styles.addButton}
             onPress={() =>
-              navigation.navigate("AdicionarVacina", {
-                creationID: creation.id,
+              navigation.navigate("AdicionarBioinsumo", {
+                cultivationID: creation.id,
               })
             }
           >
-            <Text style={styles.addButtonText}>Adicionar Vacina</Text>
+            <Text style={styles.addButtonText}>Adicionar Bioinsumo</Text>
           </TouchableOpacity>
         </View>
       );
@@ -73,30 +74,30 @@ const DetalheCultura = ({ navigation, route }) => {
     return (
       <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
         <FlatList
-          data={vaccines}
+          data={bioinsumos}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CardVacinas item={item} />} // Update this to your actual component
+          renderItem={({ item }) => <CardBioinsumos item={item} />} // Update this to your actual component
           overScrollMode="never"
         />
         <TouchableOpacity
           style={GlobalStyles.primaryButton}
           onPress={() =>
-            navigation.navigate("AdicionarVacina", {
+            navigation.navigate("AdicionarBioinsumo", {
               criationID: creation.id,
             })
           }
         >
-          <Text style={GlobalStyles.textButton}>Adicionar Vacina</Text>
+          <Text style={GlobalStyles.textButton}>Adicionar Bioinsumo</Text>
         </TouchableOpacity>
       </View>
     );
   };
 
-  const renderHistorico = () => {
-    if (!history || history.length === 0) {
+  const renderInformacoes = () => {
+    if (!informacoes || informacoes.length === 0) {
       return (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Ainda não existe histórico para essa criação.</Text>
+          <Text style={styles.emptyText}>Ainda não existe informações para essa criação.</Text>
         </View>
       );
     }
@@ -104,9 +105,9 @@ const DetalheCultura = ({ navigation, route }) => {
     return (
       <View style={{paddingHorizontal:20, height:"95%", gap:20}}>
         <FlatList
-          data={history}
+          data={informacoes}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CardHistorico item={item} />} // Update this to your actual component
+          renderItem={({ item }) => <CardInformacoes item={item} />} // Update this to your actual component
           overScrollMode="never"
         />
       </View>
@@ -114,8 +115,8 @@ const DetalheCultura = ({ navigation, route }) => {
   };
 
   const renderScene = SceneMap({
-    vaccines: renderVacinas,
-    history: renderHistorico,
+    bioinsumos: renderBioinsumos,
+    informacoes: renderInformacoes,
   });
 
   return (
@@ -124,20 +125,20 @@ const DetalheCultura = ({ navigation, route }) => {
       keyboardVerticalOffset={0}
       style={{ flex: 1 }}
     >
-      <Header screenName={creation?.nome} />
+      <Header screenName={cultivation?.nome} />
       <View style={styles.container}>
         <View style={styles.dados}>
-          <Text style={styles.title}>{creation?.especie}</Text>
+          <Text style={styles.title}>{cultivation?.tipo}</Text>
           <View style={styles.iconRow}>
-            <Text style={styles.text}>Quantidade de animais: {creation?.numero_animais}</Text>
+            <Text style={styles.text}>Area Plantada: {cultivation?.area_plantada} tarefas</Text>
             <TouchableOpacity>
-              <Octicons name="number" size={24} color="black" />
+            <FontAwesome name="area-chart" size={24} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.iconRow}>
-            <Text style={styles.text}>Peso médio: {creation?.peso_medio}</Text>
+            <Text style={styles.text}>Data de plantio: {moment(cultivation.data_plantio).format("DD/MM/YYYY")}</Text>
             <TouchableOpacity>
-              <FontAwesome6 name="weight-scale" size={24} color="black" />
+              <FontAwesome6 name="calendar" size={24} color="black" />
             </TouchableOpacity>
           </View>
         </View>
