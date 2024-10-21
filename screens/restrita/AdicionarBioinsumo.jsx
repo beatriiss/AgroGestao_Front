@@ -20,14 +20,15 @@ import moment from "moment-timezone";
 import palette from "../../styles/palette";
 import { showFlashMessage } from "../../components/Message";
 
-const AdicionarVacina = ({ navigation, route }) => {
-  const [vacinaComum, setVacinaComum] = useState("");
-  const [vacinasComuns, setVacinasComuns] = useState([]);
+const AdicionarBioinsumo = ({ navigation, route }) => {
+  const [bioinsumoComum, setBioinsumoComum] = useState("");
+  const [bioinsumosComuns, setBioinsumosComuns] = useState([]);
   const [nome, setNome] = useState("");
   const [dataCriacao, setDataCriacao] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [isDateValid, setIsDateValid] = useState(false);
-  const criacaoID = route.params.creationID;
+  const cultivoID = route.params.cultivoID;
+  console.log("Cultivo id::::",route.params.cultivoID )
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -50,43 +51,42 @@ const AdicionarVacina = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    const fetchVacinasComuns = async () => {
+    const fetchBioinsumosComuns = async () => {
       try {
-        const response = await axios.post(`${url}/vaccines/standart`);
+        const response = await axios.post(`${url}/bioinsumos/standart`);
         if (response.status === 200) {
-          setVacinasComuns(response.data);
+          setBioinsumosComuns(response.data);
         }
       } catch (error) {
-        console.error("Erro ao buscar vacinas comuns:", error);
-        showFlashMessage("Erro ao carregar vacinas comuns.", "danger");
+        console.error("Erro ao buscar bioinsumos comuns:", error);
+        showFlashMessage("Erro ao carregar bioinsumos comuns.", "danger");
       }
     };
 
-    fetchVacinasComuns();
+    fetchBioinsumosComuns();
   }, []);
 
   const handleSubmit = async () => {
-    if (!vacinaComum || !nome || !dataCriacao) {
+    if (!bioinsumoComum || !nome || !dataCriacao) {
       showFlashMessage("Todos os campos são obrigatórios.", "danger");
       return;
     }
 
     try {
-      const response = await axios.post(`${url}/vaccines`, {
+      const response = await axios.post(`${url}/bioinsumos`, {
         nome,
-        criacao_id: criacaoID,
-        vacina_comum_id: vacinaComum,
+        cultura_id: cultivoID,
+        bioinsumo_comum_id: bioinsumoComum,
         data_criacao: moment().format("YYYY-MM-DD HH:mm:ss"),
-        data_vacinacao: moment(dataCriacao, "DD/MM/YYYY").format("YYYY-MM-DD HH:mm:ss")
-
+        data_aplicacao: moment(dataCriacao, "DD/MM/YYYY").format("YYYY-MM-DD HH:mm:ss")
       });
 
       if (response.status === 201) {
-        showFlashMessage("Vacina adicionada com sucesso!", "success");
+        showFlashMessage("Bioinsumo adicionado com sucesso!", "success");
         navigation.goBack();
       }
     } catch (error) {
-      console.error("Erro ao adicionar vacina:", error);
+      console.error("Erro ao adicionar bioinsumo:", error);
       showFlashMessage("Ocorreu um erro. Por favor, tente novamente.", "danger");
     }
   };
@@ -120,7 +120,7 @@ const AdicionarVacina = ({ navigation, route }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <Header screenName="Adicionar Vacina" />
+      <Header screenName="Adicionar Bioinsumo" />
       <View style={styles.container}>
         {!keyboardVisible && (
           <Image
@@ -129,28 +129,28 @@ const AdicionarVacina = ({ navigation, route }) => {
           />
         )}
         <View style={[styles.form, keyboardVisible && { marginTop: -50 }]}>
-          <Text style={styles.label}>Vacina</Text>
+          <Text style={styles.label}>Bioinsumo</Text>
           <View style={styles.pickerContainer}>
             <Picker
-              selectedValue={vacinaComum}
-              onValueChange={(itemValue) => setVacinaComum(itemValue)}
+              selectedValue={bioinsumoComum}
+              onValueChange={(itemValue) => setBioinsumoComum(itemValue)}
               style={styles.picker}
             >
-              <Picker.Item label="Selecione uma vacina" value="" />
-              {vacinasComuns.map((item) => (
+              <Picker.Item label="Selecione um bioinsumo" value="" />
+              {bioinsumosComuns.map((item) => (
                 <Picker.Item key={item.id} label={item.nome} value={item.id} />
               ))}
             </Picker>
           </View>
-          <Text style={styles.label}>Nome da Vacina</Text>
+          <Text style={styles.label}>Nome do Bioinsumo</Text>
           <TextInput
             style={GlobalStyles.input}
-            placeholder="Digite o nome da vacina"
+            placeholder="Digite o nome do bioinsumo"
             keyboardType="default"
             value={nome}
             onChangeText={setNome}
           />
-          <Text style={styles.label}>Data de Vacinação</Text>
+          <Text style={styles.label}>Data de Aplicação</Text>
 
         <TextInput
             style={GlobalStyles.input}
@@ -158,12 +158,13 @@ const AdicionarVacina = ({ navigation, route }) => {
             keyboardType="default"
             value={dataCriacao}
             onChangeText={validateAndSetDate}
+            editable={!isDateValid} // Desabilita o campo se a data for válida
           />
           <TouchableOpacity
             style={[GlobalStyles.primaryButton, { marginTop: 20 }]}
             onPress={handleSubmit}
           >
-            <Text style={GlobalStyles.textButton}>Adicionar Vacina</Text>
+            <Text style={GlobalStyles.textButton}>Adicionar Bioinsumo</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -209,4 +210,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AdicionarVacina;
+export default AdicionarBioinsumo;

@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
+  Alert
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
@@ -19,6 +20,10 @@ import Octicons from '@expo/vector-icons/Octicons';
 import { FontAwesome6, FontAwesome5 } from "@expo/vector-icons";
 import CardVacina from "../../components/cardVacinas";
 import { buscarVacinas } from "../../utils/requests/buscarVacinas";
+import { dropCreation } from "../../utils/requests/dropCreation";
+import { showFlashMessage } from "../../components/Message";
+import { getHistoryCreation } from "../../utils/requests/getHistoryCreation";
+import CardHistorico from "../../components/cardHistorico";
 const DetalheCriacao = ({ navigation, route }) => {
   const [creation, setCreation] = useState(null);
   const [vaccines, setVaccines] = useState([]); // Vacinas
@@ -37,8 +42,7 @@ const DetalheCriacao = ({ navigation, route }) => {
       setCreation(await getCreationsDetails(route?.params?.CriacaoID));
       // TODO: Fetch vaccines and history data here
       setVaccines(await buscarVacinas(route?.params?.CriacaoID));
-
-      // setHistory(await fetchHistory(route?.params?.CriacaoID));
+      setHistory(await getHistoryCreation(route?.params?.CriacaoID));
     } catch (error) {
       console.error("Erro ao buscar a dados da criacao:", error);
     } finally {
@@ -52,6 +56,34 @@ const DetalheCriacao = ({ navigation, route }) => {
       fetchPropertie();
     }, [currentUser.id])
   );
+
+  const handleDelete = async () => {
+    Alert.alert(
+      'Confirmação de Exclusão',
+      'Tem certeza de que deseja deletar esta criação?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => console.log('Exclusão cancelada'),
+          style: 'cancel',
+        },
+        {
+          text: 'Confirmar',
+          onPress: async () => {
+            try {
+              await dropCreation(creation.id);
+              console.log('Criação deletada com sucesso');
+              showFlashMessage("Criação deletada.", "danger")
+              navigation.goBack()
+            } catch (error) {
+              console.error('Erro ao deletar criação:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   const renderVacinas = () => {
     if (!vaccines || vaccines.length === 0) {
@@ -108,7 +140,7 @@ const DetalheCriacao = ({ navigation, route }) => {
         <FlatList
           data={history}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CardHistorico item={item} />} // Update this to your actual component
+          renderItem={({ item }) => <CardHistorico item={item}/>} // Update this to your actual component
           overScrollMode="never"
         />
       </View>
@@ -129,20 +161,38 @@ const DetalheCriacao = ({ navigation, route }) => {
       <Header screenName={creation?.nome} />
       <View style={styles.container}>
         <View style={styles.dados}>
-          <View style={styles.edit}>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
             <Text style={styles.title}>{creation?.especie}</Text>
-            <TouchableOpacity style={styles.editIcon}
-              onPress={() =>
-                navigation.navigate("AdicionarCriacao", {
-                  criacaoID: creation.id,
-                })
-              }
-            >
-              <FontAwesome5 name="edit" size={24} color="black" />
-            </TouchableOpacity>
+            <View style={styles.edit}>
+              <TouchableOpacity
+                style={styles.editIcon}
+                onPress={() =>
+                  navigation.navigate("AdicionarCriacao", {
+                    criacaoID: creation.id,
+                  })
+                }
+              >
+                <FontAwesome5 name="edit" size={24} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.editIcon}
+                onPress={handleDelete}
+              >
+                <FontAwesome5 name="trash" size={24} color={palette.danger} />
+              </TouchableOpacity>
+            </View>
           </View>
+
           <View style={styles.iconRow}>
-            <Text style={styles.text}>Quantidade de animais: {creation?.numero_animais}</Text>
+            <Text style={styles.text}>
+              Quantidade de animais: {creation?.numero_animais}
+            </Text>
             <TouchableOpacity>
               <Octicons name="number" size={24} color="black" />
             </TouchableOpacity>
@@ -160,11 +210,16 @@ const DetalheCriacao = ({ navigation, route }) => {
           renderScene={renderScene}
           onIndexChange={setIndex}
           initialLayout={{ width: Platform.OS === "ios" ? 375 : 360 }}
-          renderTabBar={props => (
+          renderTabBar={(props) => (
             <TabBar
               {...props}
               indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-              style={{ backgroundColor: '#f1f1f1', marginBottom: 20, decoration: 'none', elevation: 0 }}
+              style={{
+                backgroundColor: "#f1f1f1",
+                marginBottom: 20,
+                decoration: "none",
+                elevation: 0,
+              }}
               labelStyle={{ color: palette.highlightGreen, fontSize: 16 }}
             />
           )}
@@ -201,8 +256,9 @@ const styles = StyleSheet.create({
   },
   edit: {
     flexDirection: 'row',
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
+    gap: 10
   },
   text: {
     fontSize: 20,

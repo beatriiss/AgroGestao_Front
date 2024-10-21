@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
+  Alert
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
@@ -21,6 +22,9 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import CardCultivos from "../../components/CardCultivos";
+import { dropProperty } from "../../utils/requests/dropProperty";
+import { showFlashMessage } from "../../components/Message";
+
 const DetalhesPropriedade = ({ navigation, route }) => {
   const [property, setProperty] = useState(null);
   const [creations, setCreations] = useState(null);
@@ -147,6 +151,34 @@ const DetalhesPropriedade = ({ navigation, route }) => {
     cultures: renderCulturas,
   });
 
+  const handleDelete = async () => {
+    Alert.alert(
+      'Confirmação de Exclusão',
+      'Tem certeza de que deseja deletar esta Propriedade e todas as criações e cultivos ligadas a ela?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => console.log('Exclusão cancelada'),
+          style: 'cancel',
+        },
+        {
+          text: 'Confirmar',
+          onPress: async () => {
+            try {
+              await dropProperty(property.id);
+              console.log('Criação deletada com sucesso');
+              showFlashMessage("Criação deletada.", "danger")
+              navigation.goBack()
+            } catch (error) {
+              console.error('Erro ao deletar criação:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -158,6 +190,12 @@ const DetalhesPropriedade = ({ navigation, route }) => {
         <View style={styles.dados}>
           <View style={styles.edit}>
             <Text style={styles.title}>{property?.nome}</Text>
+            <View  style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap:10
+            }}>
             <TouchableOpacity style={styles.editIcon}
               onPress={() =>
                 navigation.navigate("AdicionarPropriedade", {
@@ -167,6 +205,15 @@ const DetalhesPropriedade = ({ navigation, route }) => {
             >
               <FontAwesome5 name="edit" size={24} color="black" />
             </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.editIcon}
+                onPress={handleDelete}
+
+              >
+                <FontAwesome5 name="trash" size={24} color={palette.danger} />
+              </TouchableOpacity>
+            </View>
+            
           </View>
           <View style={styles.iconRow}>
             <Text style={styles.text}>Localização: {"\n"}{property?.localizacao}</Text>

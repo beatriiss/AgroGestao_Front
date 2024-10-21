@@ -1,0 +1,53 @@
+{
+    "culturas": {
+      "Abóbora": {
+        "melhor_data_plantio": "Março a Julho",
+        "bioinsumos_recomendados": ["Chorume de Composto Orgânico", "Biofertilizante de Esterco Bovino"],
+        "clima_ideal": "Quente e úmido, com temperaturas entre 20°C e 30°C",
+        "tempo_para_colheita": "90 a 120 dias",
+        "necessidade_hidrica": "40 a 50 litros por planta",
+        "espaçamento": "2m entre plantas"
+      },
+      "Aipim": {
+        "melhor_data_plantio": "Setembro a Dezembro",
+        "bioinsumos_recomendados": ["Fertilizante de Cinzas de Madeira", "Adubo Verde"],
+        "clima_ideal": "Quente e tropical, com temperaturas entre 22°C e 30°C",
+        "tempo_para_colheita": "10 a 12 meses",
+        "necessidade_hidrica": "60 a 70 litros por planta",
+        "espaçamento": "1m entre plantas"
+      },
+      "Laranja": {
+        "melhor_data_plantio": "Fevereiro a Maio",
+        "bioinsumos_recomendados": ["Húmus de Minhoca", "Fertilizante de Algas Marinhas"],
+        "clima_ideal": "Clima subtropical, com temperaturas entre 23°C e 32°C",
+        "tempo_para_colheita": "6 a 12 meses após o florescimento",
+        "necessidade_hidrica": "80 a 120 litros por planta por ano",
+        "espaçamento": "4m entre plantas"
+      },
+      "Melancia": {
+        "melhor_data_plantio": "Agosto a Novembro",
+        "bioinsumos_recomendados": ["Chorume de Composto Orgânico", "Biofertilizante de Esterco Bovino"],
+        "clima_ideal": "Quente e seco, com temperaturas entre 24°C e 30°C",
+        "tempo_para_colheita": "80 a 90 dias",
+        "necessidade_hidrica": "30 a 40 litros por planta",
+        "espaçamento": "2m entre plantas"
+      },
+      "Amendoim": {
+        "melhor_data_plantio": "Setembro a Novembro",
+        "bioinsumos_recomendados": ["Fertilizante de Cinzas de Madeira", "Adubo Verde"],
+        "clima_ideal": "Clima tropical, com temperaturas entre 20°C e 30°C",
+        "tempo_para_colheita": "90 a 120 dias",
+        "necessidade_hidrica": "50 a 70 litros por planta",
+        "espaçamento": "0.5m entre plantas"
+      },
+      "Milho": {
+        "melhor_data_plantio": "Setembro a Janeiro",
+        "bioinsumos_recomendados": ["Adubo Verde", "Biofertilizante de Esterco Bovino"],
+        "clima_ideal": "Clima subtropical, com temperaturas entre 21°C e 30°C",
+        "tempo_para_colheita": "100 a 120 dias",
+        "necessidade_hidrica": "60 a 70 litros por planta",
+        "espaçamento": "1m entre plantas"
+      }
+    }
+  }
+  
