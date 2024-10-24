@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext'; // Certifique-se de ter este hook para obter o usuário autenticado
 import { url } from '../../config/url';
@@ -10,6 +10,8 @@ import { useFocusEffect } from '@react-navigation/native'; // Importe o useFocus
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { getPropertyCreations } from '../../utils/requests/getPropertyCreations';
 import { getPropertyCultivations } from '../../utils/requests/getPropertyCultivations';
+
+const propIcon = require('../../assets/icon_green.png');
 
 const Propriedades = ({ navigation }) => {
   const [properties, setProperties] = useState([]);
@@ -92,7 +94,10 @@ const Propriedades = ({ navigation }) => {
                 <TouchableOpacity style={styles.propertyCard} onPress={() => navigation.navigate("DetalhePropriedade", { propriedadeID: item.id })} >
                   <View style={styles.propertyIdent}>
                     <Text style={styles.propertyText}>{item.nome}</Text>
-                    <FontAwesome5 name="home" size={24} color={palette.primaryGreen} />
+                    <Image
+                    source={propIcon} 
+                    style={styles.PropIcon} 
+                  />
                   </View>
                   <View style={styles.propertyInfo}>
                     <View style={{alignItems: "center"}}>
@@ -181,6 +186,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: palette.highlightGreen
+  },
+  PropIcon: {
+    width: 22,
+    height: 28,
   },
 });
 
