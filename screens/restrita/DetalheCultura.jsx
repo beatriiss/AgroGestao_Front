@@ -88,7 +88,7 @@ const DetalheCultura = ({ navigation, route }) => {
           style={GlobalStyles.primaryButton}
           onPress={() =>
             navigation.navigate("AdicionarBioinsumo", {
-              cultivoID: creation.id,
+              cultivoID: cultivation.id,
             })
           }
         >
