@@ -8,9 +8,9 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  StatusBar,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import axios from 'axios';
 import { url } from '../../config/url';
@@ -18,7 +18,6 @@ import { useAuth } from "../../context/AuthContext";
 import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
 import Header from "../../components/Header";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 const propIcon = require('../../assets/icon_green.png');
 
@@ -27,7 +26,6 @@ const Home = ({ navigation }) => {
   const [datalhes, setdatalhes] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
-
 
   // Função para buscar propriedades do usuário
   const fetchData = async () => {
@@ -51,44 +49,65 @@ const Home = ({ navigation }) => {
     }, [currentUser.id])
   );
 
+  if (loading) {
+    // Mostrar loader enquanto os dados estão sendo carregados
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={palette.primaryGreen} />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={50}
+      style={{ flex: 1 }}
     >
       <Header screenName={"Home"} />
 
-      <View style={styles.detalhes} >
-        <Text style={[styles.titulo, styles.texto]} >Voçê tem:</Text>
-        <Text style={styles.texto} >{properties.length} Prorpiedades cadastradas</Text>
-        <Text style={styles.texto} >{datalhes.total_criacoes} criações</Text>
-        <Text style={styles.texto} >{datalhes.total_culturas} Plantações</Text>
+      <View style={styles.detalhes}>
+        <Text style={[styles.titulo, styles.texto]}>Você tem:</Text>
+        <Text style={styles.texto}>{properties.length} Propriedades cadastradas</Text>
+        <Text style={styles.texto}>{datalhes?.total_criacoes || 0} Criações</Text>
+        <Text style={styles.texto}>{datalhes?.total_culturas || 0} Plantações</Text>
       </View>
+
       <View style={styles.container}>
-        <Text style={[styles.titulo, styles.texto]} >As suas prorpiedades</Text>
-        {properties.length === 0 ? (
+        {properties.length > 0 && (
+          <Text style={[styles.titulo, styles.texto]}>
+            Essas são as suas propriedades
+          </Text>
+        )}
+
+        {properties.length === 0 && (!datalhes || Object.keys(datalhes).length === 0) ? (
           <View style={styles.centered}>
-            <Text>Ainda não há propriedades cadastradas.</Text>
+            <Text style={styles.texto}>Ainda não há propriedades cadastradas.</Text>
+            <TouchableOpacity style={GlobalStyles.primaryButton} onPress={() => navigation.navigate("AdicionarPropriedade")}>
+              <Text style={GlobalStyles.textButton}>Adicionar Nova Propriedade</Text>
+            </TouchableOpacity>
           </View>
         ) : (
-          <>
-            <FlatList
-              data={properties}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.propertyCard} onPress={() => navigation.navigate("DetalhePropriedade", { propriedadeID: item.id })} >
-                  <Text style={styles.propertyText}>{item.nome}</Text>
-                  <Image
-                    source={propIcon} 
-                    style={styles.PropIcon} 
-                  />
-                </TouchableOpacity>
-              )}
-              contentContainerStyle={styles.listContent}
-              style={styles.flatList}
-              overScrollMode="never"
-            />
-          </>
+          <FlatList
+            data={properties}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.propertyCard}
+                onPress={() =>
+                  navigation.navigate("DetalhePropriedade", {
+                    propriedadeID: item.id,
+                  })
+                }
+              >
+                <Text style={styles.propertyText}>{item.nome}</Text>
+                <Image source={propIcon} style={styles.PropIcon} />
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={styles.listContent}
+            style={styles.flatList}
+            overScrollMode="never"
+          />
         )}
       </View>
     </KeyboardAvoidingView>
@@ -96,8 +115,12 @@ const Home = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-
-
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
   detalhes: {
     padding: 15,
     marginTop: 40,
@@ -137,6 +160,25 @@ const styles = StyleSheet.create({
   PropIcon: {
     width: 22,
     height: 28,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  addButton: {
+    marginTop: 20,
+    backgroundColor: palette.primaryGreen,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 

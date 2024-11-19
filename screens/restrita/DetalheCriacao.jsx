@@ -24,6 +24,7 @@ import { dropCreation } from "../../utils/requests/dropCreation";
 import { showFlashMessage } from "../../components/Message";
 import { getHistoryCreation } from "../../utils/requests/getHistoryCreation";
 import CardHistorico from "../../components/cardHistorico";
+
 const DetalheCriacao = ({ navigation, route }) => {
   const [creation, setCreation] = useState(null);
   const [vaccines, setVaccines] = useState([]); // Vacinas
@@ -32,8 +33,8 @@ const DetalheCriacao = ({ navigation, route }) => {
   const { currentUser } = useAuth();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'vaccines', title: 'Vacinas' },
-    { key: 'history', title: 'Histórico' },
+    { key: 'vaccines', title: 'VACINAS' },
+    { key: 'history', title: 'HISTÓRICO' },
   ]);
 
   const fetchPropertie = async () => {
@@ -214,13 +215,10 @@ const DetalheCriacao = ({ navigation, route }) => {
             <TabBar
               {...props}
               indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-              style={{
-                backgroundColor: "#f1f1f1",
-                marginBottom: 20,
-                decoration: "none",
-                elevation: 0,
-              }}
-              labelStyle={{ color: palette.highlightGreen, fontSize: 16 }}
+              style={{ backgroundColor: '#f1f1f1', marginBottom: 20, elevation: 0 }}
+              labelStyle={{ color: palette.highlightGreen, fontSize: 20, fontWeight: "bold" }}
+              activeColor={palette.highlightGreen} // Cor quando ativo
+              inactiveColor="gray" // Cor quando inativo
             />
           )}
         />

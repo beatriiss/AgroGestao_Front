@@ -78,9 +78,7 @@ const AdicionarPropriedade = ({ navigation, route }) => {
           usuario_id: currentUser.id,
         };
         const response = await createProperty(propertyData);
-        navigation.navigate("DetalhePropriedade", {
-          propriedadeID: response.property.insertId,
-        });
+        navigation.navigate("Home", {screen:'Properties'});
       } catch (error) {
         console.log("erro cadastrando a propriedade");
       }

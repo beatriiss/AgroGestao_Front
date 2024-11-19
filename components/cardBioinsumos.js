@@ -114,7 +114,7 @@ const CardBioinsumo = ({ item, onDelete }) => {
       {isExpanded && (
         <View style={styles.expandableContainer}>
           {isLoading?(<ActivityIndicator size="large" color={palette.green} />):<>
-          <Text style={styles.label}>Doses:</Text>
+          {!doses==[] && <Text style={styles.label}>Doses:</Text>}
           {doses.map((dose, index) => (
             <View key={index} style={styles.doseContainer}>
               <View style={styles.checkboxContainer}>

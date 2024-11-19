@@ -4,11 +4,11 @@ import {
   View,
   StatusBar,
   TouchableOpacity,
+  Image
 } from "react-native";
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import palette from "../styles/palette";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 
 const Header = ({ screenName }) => {
@@ -24,7 +24,14 @@ const Header = ({ screenName }) => {
       <View style={styles.header}>
         {shouldShowBackButton && (
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons size={32} color={"white"} name="arrow-left-bold" />
+                          <Image
+                source={require("../assets/back.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
           </TouchableOpacity>
         )}
 
@@ -35,11 +42,25 @@ const Header = ({ screenName }) => {
         {/* Condicional para exibir o ícone de logout ou home */}
         {(screenName === "Home" || screenName === "Perfil" || screenName === "Edição de Perfil") ? (
           <TouchableOpacity onPress={logout}>
-            <MaterialCommunityIcons size={32} color={"white"} name="logout" />
+             <Image
+                source={require("../assets/logout.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={() => navigation.navigate('Home', {screen:"home"})}>
-            <MaterialCommunityIcons size={32} color={"white"} name="home" />
+            <Image
+                source={require("../assets/home_w.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
           </TouchableOpacity>
         )}
       </View>

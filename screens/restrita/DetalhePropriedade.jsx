@@ -33,8 +33,8 @@ const DetalhesPropriedade = ({ navigation, route }) => {
   const { currentUser } = useAuth();
   const [index, setIndex] = useState(0); // Índice da aba ativa
   const [routes] = useState([
-    { key: 'creations', title: 'Criações' },
-    { key: 'cultures', title: 'Cultivos' },
+    { key: 'creations', title: 'CRIAÇÕES' },
+    { key: 'cultures', title: 'CULTIVOS' },
   ]);
 
   const fetchPropertie = async () => {
@@ -230,19 +230,22 @@ const DetalhesPropriedade = ({ navigation, route }) => {
         </View>
 
         {/* TabView para alternar entre Criações e Culturas */}
-        <TabView
+ <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}
           onIndexChange={setIndex}
           initialLayout={{ width: Platform.OS === "ios" ? 375 : 360 }}
-          renderTabBar={props => (
-            <TabBar
-              {...props}
-              indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-              style={{ backgroundColor: '#f1f1f1', marginBottom: 20, decoration: 'none', elevation: 0 }}
-              labelStyle={{ color: palette.highlightGreen, fontSize: 16 }}
-            />
-          )}
+          renderTabBar={(props) => (
+  <TabBar
+    {...props}
+    indicatorStyle={{ backgroundColor: palette.primaryGreen }}
+    style={{ backgroundColor: '#f1f1f1', marginBottom: 20, elevation: 0 }}
+    labelStyle={{ color: palette.highlightGreen, fontSize: 16, fontWeight: "bold" }}
+    activeColor={palette.highlightGreen} // Cor quando ativo
+    inactiveColor="gray" // Cor quando inativo
+  />
+)}
+
         />
       </View>
     </KeyboardAvoidingView>

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext'; // Certifique-se de ter este hook para obter o usuário autenticado
 import { url } from '../../config/url';
@@ -65,7 +65,7 @@ const Propriedades = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <Text>Carregando...</Text>
+        <ActivityIndicator color={palette.primaryGreen} size={'large'}/>
       </View>
     );
   }
@@ -80,7 +80,7 @@ const Propriedades = ({ navigation }) => {
       <View style={styles.container}>
         {properties.length === 0 ? (
           <View style={styles.centered}>
-            <Text>Ainda não há propriedades cadastradas.</Text>
+            <Text style={{fontSize:16, fontWeight:'600'}}>Ainda não há propriedades cadastradas.</Text>
           </View>
         ) : (
           <>
@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: -200
   },
   listContent: {
     flexGrow: 1,
@@ -181,6 +182,7 @@ const styles = StyleSheet.create({
   propertyInfo: {
     flexDirection: "row",
     justifyContent: "space-evenly",
+    marginTop:10
   },
   text: {
     fontSize: 16,

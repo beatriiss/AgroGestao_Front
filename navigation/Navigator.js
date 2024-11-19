@@ -12,7 +12,6 @@ import LoginScreen from "../screens/Login";
 import RegisterScreen from "../screens/Cadastro";
 import { useAuth } from "../context/AuthContext";
 import palette from "../styles/palette";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ModalPassword } from "./../components/Modal/ModalPassword";
 import AdicionarPropriedade from "../screens/restrita/AdicionarPropriedade";
 import DetalhePropriedade from './../screens/restrita/DetalhePropriedade';
@@ -50,7 +49,7 @@ const HomeTabs = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="home"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: palette.primaryGreen,
@@ -106,15 +105,32 @@ const HomeTabs = () => {
             focused ? (
               <View style={styles.addButtonContainer}>
                 <View style={styles.addButton}>
-                  <MaterialCommunityIcons name="home" color="#fff" size={30} />
+                  <Image
+                    source={require("../assets/home_w.png")}
+                    style={{
+                      width: 30,
+                      height: 30,
+                    }}
+                    resizeMode="contain"
+                  />
                 </View>
               </View>
             ) : (
-              <MaterialCommunityIcons
-                size={32}
-                color={palette.primaryGreen}
-                name="home"
+              <View
+              style={[
+                styles.iconContainer,
+                focused && styles.iconContainerSelected, // Adiciona o estilo quando focado
+              ]}
+            >
+              <Image
+                source={require("../assets/home_g.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
               />
+            </View>
             ),
         }}
       />
@@ -126,19 +142,32 @@ const HomeTabs = () => {
             focused ? (
               <View style={styles.addButtonContainer}>
                 <View style={styles.addButton}>
-                  <MaterialCommunityIcons
-                    name="account"
-                    color="#fff"
-                    size={30}
+                  <Image
+                    source={require("../assets/user_w.png")}
+                    style={{
+                      width: 30,
+                      height: 30,
+                    }}
+                    resizeMode="contain"
                   />
                 </View>
               </View>
             ) : (
-              <MaterialCommunityIcons
-                size={32}
-                color={palette.primaryGreen}
-                name="account"
+              <View
+              style={[
+                styles.iconContainer,
+                focused && styles.iconContainerSelected, // Adiciona o estilo quando focado
+              ]}
+            >
+              <Image
+                source={require("../assets/user_g.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
               />
+            </View>
             ),
         }}
       />
@@ -171,6 +200,8 @@ const AppNavigator = () => {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="DetalhePropriedade"   
+        component={DetalhePropriedade} />
         </>
       )}
 

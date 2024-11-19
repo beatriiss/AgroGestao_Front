@@ -4,6 +4,7 @@ import { url } from '../../config/url';
 export const getPropertyDetails = async (id) => {
   try {
     const response = await axios.get(`${url}/properties/${id}`);
+    console.log(response.data)
     return response.data; // Retorna os dados da resposta da API
   } catch (error) {
     // Lida com erros e pode retornar uma mensagem ou lançar um erro

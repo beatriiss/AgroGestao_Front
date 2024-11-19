@@ -107,7 +107,7 @@ export const AuthProvider = ({ children }) => {
         showFlashMessage('Ocorreu um erro. Por favor, tente novamente.', 'danger');
       }
     } else {
-      showFlashMessage('Erro de rede. Verifique sua conexão.', 'danger');
+      showFlashMessage(`${error}`, 'danger');
     }
 
     console.error('Erro ao fazer login:', error);

@@ -33,8 +33,8 @@ export function ModalPassword({ editable, handleClose }) {
                 />
 
                 <View style={styles.buttons}>
-                <TouchableOpacity style={[GlobalStyles.primaryButton, styles.button]} onPress={handleClose}>
-                    <Text style={GlobalStyles.textButton}>Voltar</Text>
+                <TouchableOpacity style={[GlobalStyles.primaryButton, styles.button, {backgroundColor:palette.danger}]} onPress={handleClose}>
+                    <Text style={GlobalStyles.textButton}>Cancelar</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={[GlobalStyles.primaryButton, styles.button]} onPress={confirmPassword}>
@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
     },
     buttons: {
         flexDirection: 'row',
-        width: '80%',
-        justifyContent: 'space-evenly'
+        width: '50%',
+        justifyContent: 'center'
     },
     button: {
         width: '60%', 

@@ -25,6 +25,7 @@ const Perfil = () => {
   const [password, setPassword] = useState(currentUser?.senha || "");
   const [edit, setEdit] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -139,6 +140,19 @@ const Perfil = () => {
               </TouchableOpacity>
             )}
           </View>
+          {!edit && (
+            <TouchableOpacity onPress={() => setDeleteModalVisible(true)}>
+              <Text
+                style={{
+                  marginTop: 20,
+                  color: palette.danger,
+                  fontWeight: "600",
+                }}
+              >
+                Solicitar exclusão de conta
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
       <Modal visible={modalVisible} animationType="fade" transparent={true}>
@@ -147,23 +161,35 @@ const Perfil = () => {
           handleClose={() => setModalVisible(false)}
         />
       </Modal>
+      <Modal
+        visible={deleteModalVisible}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Solicitação de Exclusão</Text>
+            <Text style={styles.modalText}>
+              Para excluir sua conta, envie um e-mail para:{"\n"}
+              <Text style={{ fontWeight: "bold" }}>
+                isisbeatris.dev@gmail.com
+              </Text>{" "}
+              solicitando a remoção dos seus dados da base de dados.
+            </Text>
+            <TouchableOpacity
+              style={[GlobalStyles.primaryButton, styles.modalButton]}
+              onPress={() => setDeleteModalVisible(false)}
+            >
+              <Text style={GlobalStyles.textButton}>Fechar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  // Início do estilo do header
-  header: {
-    flexDirection: "row",
-    backgroundColor: palette.primaryGreen,
-    padding: 16,
-    justifyContent: "space-between",
-  },
-  textheader: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  // Fim do estilo do header
   container: {
     padding: 20,
     display: "flex",
@@ -171,11 +197,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
   },
-  buttons:{
-    display:'flex',
-    width:'100%',
-    flexDirection:'row',
-    justifyContent:'space-between'
+  buttons: {
+    display: "flex",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   form: {
     display: "flex",
@@ -196,6 +222,32 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     marginTop: -140,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "95%",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButton: {
+    width: "100%",
   },
 });
 
