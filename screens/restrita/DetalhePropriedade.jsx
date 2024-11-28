@@ -7,7 +7,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
-  Alert
+  Alert,
+  ScrollView,
+  Image
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
@@ -18,9 +20,8 @@ import Header from "../../components/Header";
 import CardCriacoes from "../../components/CardCriacoes";
 import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import CardCultivos from "../../components/CardCultivos";
 import { dropProperty } from "../../utils/requests/dropProperty";
 import { showFlashMessage } from "../../components/Message";
@@ -28,23 +29,18 @@ import { showFlashMessage } from "../../components/Message";
 const DetalhesPropriedade = ({ navigation, route }) => {
   const [property, setProperty] = useState(null);
   const [creations, setCreations] = useState(null);
-  const [cultures, setCultures] = useState(null); // Culturas
+  const [cultures, setCultures] = useState(null);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
-  const [index, setIndex] = useState(0); // Índice da aba ativa
-  const [routes] = useState([
-    { key: 'creations', title: 'CRIAÇÕES' },
-    { key: 'cultures', title: 'CULTIVOS' },
-  ]);
+  const [activeTab, setActiveTab] = useState("creations"); // Aba ativa
 
   const fetchPropertie = async () => {
     try {
       setProperty(await getPropertyDetails(route?.params?.propriedadeID));
       setCreations(await getPropertyCreations(route?.params?.propriedadeID));
-      // Aqui você faria uma requisição para obter as culturas, se aplicável.
       setCultures(await getPropertyCultivations(route?.params?.propriedadeID));
     } catch (error) {
-      console.error("Erro ao buscar a dados da propriedade:", error);
+      console.error("Erro ao buscar os dados da propriedade:", error);
     } finally {
       setLoading(false);
     }
@@ -77,27 +73,36 @@ const DetalhesPropriedade = ({ navigation, route }) => {
     }
 
     return (
-      <View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
+<View style={{ flex: 1, paddingHorizontal: 20 }}>
+  <FlatList
+    data={creations}
+    keyExtractor={(item) => item.id.toString()}
+    renderItem={({ item }) => <CardCriacoes item={item} />}
+    overScrollMode="never"
+    contentContainerStyle={{ paddingBottom: 80 }} // Espaço para o botão fixo
+  />
 
-        <FlatList
-          data={creations}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CardCriacoes item={item} />}
-          overScrollMode="never"
+  <TouchableOpacity
+    style={[
+      GlobalStyles.primaryButton,
+      {
+        position: "absolute",
+        bottom: 20,
+        left: 20,
+        right: 20,
+      },
+    ]}
+    onPress={() =>
+      navigation.navigate("AdicionarCriacao", {
+        propriedadeID: property.id,
+      })
+    }
+  >
+    <Text style={GlobalStyles.textButton}>Adicionar Criação</Text>
+  </TouchableOpacity>
+</View>
 
-        />
-        <TouchableOpacity
-          style={GlobalStyles.primaryButton}
-          onPress={() =>
-            navigation.navigate("AdicionarCriacao", {
-              propriedadeID: property.id,
-            })
-          }
-        >
-          <Text style={GlobalStyles.textButton}>Adicionar Criação</Text>
-        </TouchableOpacity>
 
-      </View>
     );
   };
 
@@ -120,57 +125,59 @@ const DetalhesPropriedade = ({ navigation, route }) => {
       );
     }
 
-    // Exemplo: Lista de culturas
-    return (<View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
+    return (
+<View style={{ flex: 1, paddingHorizontal: 20 }}>
+  <FlatList
+    data={cultures}
+    keyExtractor={(item) => item.id.toString()}
+    renderItem={({ item }) => <CardCultivos item={item} />}
+    overScrollMode="never"
+    contentContainerStyle={{ paddingBottom: 80 }} // Espaço para o botão fixo
+  />
 
-      <FlatList
-        data={cultures}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <CardCultivos item={item} />}
-        overScrollMode="never"
+  <TouchableOpacity
+    style={[
+      GlobalStyles.primaryButton,
+      {
+        position: "absolute",
+        bottom: 20,
+        left: 20,
+        right: 20,
+      },
+    ]}
+    onPress={() =>
+      navigation.navigate("AdicionarCultura", {
+        propriedadeID: property.id,
+      })
+    }
+  >
+    <Text style={GlobalStyles.textButton}>Adicionar Cultivo</Text>
+  </TouchableOpacity>
+</View>
 
-      />
-      <TouchableOpacity
-        style={GlobalStyles.primaryButton}
-        onPress={() =>
-          navigation.navigate("AdicionarCultura", {
-            propriedadeID: property.id,
-          })
-        }
-      >
-        <Text style={GlobalStyles.textButton}>Adicionar Cultivo</Text>
-      </TouchableOpacity>
-
-    </View>
     );
   };
 
-  // Definindo as cenas para as abas
-  const renderScene = SceneMap({
-    creations: renderCriacoes,
-    cultures: renderCulturas,
-  });
-
   const handleDelete = async () => {
     Alert.alert(
-      'Confirmação de Exclusão',
-      'Tem certeza de que deseja deletar esta Propriedade e todas as criações e cultivos ligadas a ela?',
+      "Confirmação de Exclusão",
+      "Tem certeza de que deseja deletar esta Propriedade e todas as criações e cultivos ligadas a ela?",
       [
         {
-          text: 'Cancelar',
-          onPress: () => console.log('Exclusão cancelada'),
-          style: 'cancel',
+          text: "Cancelar",
+          onPress: () => console.log("Exclusão cancelada"),
+          style: "cancel",
         },
         {
-          text: 'Confirmar',
+          text: "Confirmar",
           onPress: async () => {
             try {
               await dropProperty(property.id);
-              console.log('Criação deletada com sucesso');
-              showFlashMessage("Criação deletada.", "danger")
-              navigation.goBack()
+              console.log("Criação deletada com sucesso");
+              showFlashMessage("Criação deletada.", "danger");
+              navigation.goBack();
             } catch (error) {
-              console.error('Erro ao deletar criação:', error);
+              console.error("Erro ao deletar criação:", error);
             }
           },
         },
@@ -190,72 +197,105 @@ const DetalhesPropriedade = ({ navigation, route }) => {
         <View style={styles.dados}>
           <View style={styles.edit}>
             <Text style={styles.title}>{property?.nome}</Text>
-            <View  style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap:10
-            }}>
-            <TouchableOpacity style={styles.editIcon}
-              onPress={() =>
-                navigation.navigate("AdicionarPropriedade", {
-                  propriedadeID: property.id,
-                })
-              }
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: 15,
+              }}
             >
-              <FontAwesome5 name="edit" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
+              <TouchableOpacity
                 style={styles.editIcon}
-                onPress={handleDelete}
-
+                onPress={() =>
+                  navigation.navigate("AdicionarPropriedade", {
+                    propriedadeID: property.id,
+                  })
+                }
               >
-                <FontAwesome5 name="trash" size={24} color={palette.danger} />
+                                <Image
+                source={require("../../assets/edit.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
               </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleDelete}>
+                <Image
+                source={require("../../assets/trash.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
+          </TouchableOpacity>
             </View>
-            
           </View>
           <View style={styles.iconRow}>
-            <Text style={styles.text}>Localização: {"\n"}{property?.localizacao}</Text>
+            <Text style={{fontSize:18}}>
+              Localização: {"\n"}
+              {property?.localizacao}
+            </Text>
             <TouchableOpacity>
               <FontAwesome5 name="map-marked-alt" size={24} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.iconRow}>
-            <Text style={styles.text}>Área Total: {property?.area_total}</Text>
+            <Text style={{fontSize:18}}>Área Total: {property?.area_total}</Text>
             <TouchableOpacity>
               <FontAwesome name="area-chart" size={24} color="black" />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* TabView para alternar entre Criações e Culturas */}
- <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{ width: Platform.OS === "ios" ? 375 : 360 }}
-          renderTabBar={(props) => (
-  <TabBar
-    {...props}
-    indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-    style={{ backgroundColor: '#f1f1f1', marginBottom: 20, elevation: 0 }}
-    labelStyle={{ color: palette.highlightGreen, fontSize: 16, fontWeight: "bold" }}
-    activeColor={palette.highlightGreen} // Cor quando ativo
-    inactiveColor="gray" // Cor quando inativo
-  />
-)}
+        {/* Alternador de abas */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              activeTab === "creations" && styles.activeTabButton,
+            ]}
+            onPress={() => setActiveTab("creations")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "creations" && styles.activeTabText,
+              ]}
+            >
+              CRIAÇÕES
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              activeTab === "cultures" && styles.activeTabButton,
+            ]}
+            onPress={() => setActiveTab("cultures")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "cultures" && styles.activeTabText,
+              ]}
+            >
+              CULTIVOS
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-        />
+        {activeTab === "creations" ? renderCriacoes() : renderCulturas()}
+
       </View>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   dados: {
     marginHorizontal: 20,
     padding: 10,
@@ -263,47 +303,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: palette.primaryGreen,
     marginVertical: 20,
-    marginBottom: 20,
+    gap:5
   },
-  iconRow: {
-    flexDirection: 'row-reverse',
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 10,
-  },
-  edit: {
-    flexDirection: 'row',
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "600",
-    color: palette.highlightGreen,
-  },
-  text: {
-    fontSize: 20,
-    width: "90%",
-  },
-  emptyContainer: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  emptyText: {
-    fontSize: 18,
-    color: "gray",
-    marginBottom: 10,
-  },
-  addButton: {
-    backgroundColor: palette.primaryGreen,
-    padding: 10,
-    borderRadius: 5,
-  },
-  addButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
+  edit: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  title: { fontSize: 22, fontWeight: "600", color: palette.highlightGreen },
+  iconRow: { flexDirection: "row-reverse", justifyContent: "flex-end", alignItems: "center", gap: 10 },
+  tabContainer: { flexDirection: "row", justifyContent: "center", marginVertical: 10, width:'100%' },
+  tabButton: { padding: 10, borderBottomWidth: 2, borderBottomColor: "transparent", width:'50%', display:'flex', alignItems:'center', justifyContent:'center'},
+  activeTabButton: { borderBottomColor: palette.primaryGreen },
+  tabText: { fontSize: 16, color: "gray", textAlign:'center' },
+  activeTabText: { color: palette.highlightGreen, fontWeight: "bold" },
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginTop:-150},
+  emptyText: { fontSize: 18, color: "gray" },
+  addButton: { marginTop: 10, backgroundColor: palette.primaryGreen, padding: 10, borderRadius: 5 },
+  addButtonText: { color: "white", fontWeight: "bold", textAlign: "center" },
 });
 
 export default DetalhesPropriedade;

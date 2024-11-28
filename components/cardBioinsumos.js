@@ -98,16 +98,27 @@ const CardBioinsumo = ({ item, onDelete }) => {
           }}
         >
           <TouchableOpacity onPress={toggleExpand} style={styles.deleteButton}>
-            <Ionicons
-              name={isExpanded ? "chevron-up" : "chevron-down"}
-              size={24}
-              color="black"
-            />
+          <Image
+    source={
+      isExpanded
+        ? require('../assets/up.png') // Imagem para estado expandido
+        : require('../assets/down.png') // Imagem para estado contraído
+    }
+    style={{ width: 24, height: 24 }} // Ajuste o tamanho da imagem conforme necessário
+    resizeMode="contain" // Ajuste como a imagem será exibida
+  />
           </TouchableOpacity>
           <Text style={styles.tipoText}>{item.nome_bioinsumos}</Text>
         </View>
         <TouchableOpacity onPress={handleDelete} style={styles.tipoContainer}>
-          <Ionicons name="trash-bin" size={24} color="red" />
+        <Image
+                source={require("../assets/trash.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
         </TouchableOpacity>
       </View>
 
@@ -123,9 +134,23 @@ const CardBioinsumo = ({ item, onDelete }) => {
                   onPress={() => toggleDoseStatus(dose.id, dose.concluido)}
                 >
                   {dose.concluido ? (
-                    <Ionicons name="checkbox" size={24} color={palette.green} />
+                            <Image
+                            source={require("../assets/check.png")}
+                            style={{
+                              width: 20,
+                              height: 20,
+                            }}
+                            resizeMode="contain"
+                          />
                   ) : (
-                    <Ionicons name="square-outline" size={24} color="black" />
+                    <Image
+                    source={require("../assets/square.png")}
+                    style={{
+                      width: 20,
+                      height: 20,
+                    }}
+                    resizeMode="contain"
+                  />
                   )}
                 </TouchableOpacity>
               </View>
@@ -181,8 +206,6 @@ const styles = StyleSheet.create({
   checkbox: {
     width: 24,
     height: 24,
-    borderWidth: 1,
-    borderColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
   },

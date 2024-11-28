@@ -1,1 +1,1 @@
-export const url = 'http://10.40.200.37:3030'
+export const url = 'https://bcc9-165-227-83-172.ngrok-free.app'

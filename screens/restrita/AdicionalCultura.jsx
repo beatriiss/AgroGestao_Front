@@ -29,9 +29,10 @@ import { updateCultivation } from "../../utils/requests/updateCultivation";
 const especiesComuns = [
   { label: "Milho", value: "Milho" },
   { label: "Amendoim", value: "Amendoim" },
-  { label: "Mandioca", value: "Mandioca" },
   { label: "Aipim", value: "Aipim" },
   { label: "Laranja", value: "Laranja" },
+  { label: "Abóbora", value: "Abóbora" },
+  { label: "Melancia", value: "Melancia" },
 ];
 
 const AdicionarCultura = ({ navigation, route }) => { 

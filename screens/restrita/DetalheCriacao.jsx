@@ -7,7 +7,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
-  Alert
+  Alert,
+  Image
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
@@ -15,8 +16,7 @@ import { getCreationsDetails } from "../../utils/requests/getCriationDetails";
 import Header from "../../components/Header";
 import palette from "../../styles/palette";
 import GlobalStyles from "../../styles/global";
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import Octicons from '@expo/vector-icons/Octicons';
+import Octicons from "@expo/vector-icons/Octicons";
 import { FontAwesome6, FontAwesome5 } from "@expo/vector-icons";
 import CardVacina from "../../components/cardVacinas";
 import { buscarVacinas } from "../../utils/requests/buscarVacinas";
@@ -32,9 +32,10 @@ const DetalheCriacao = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
   const [index, setIndex] = useState(0);
+
   const [routes] = useState([
-    { key: 'vaccines', title: 'VACINAS' },
-    { key: 'history', title: 'HISTÓRICO' },
+    { key: "vaccines", title: "VACINAS" },
+    { key: "history", title: "HISTÓRICO" },
   ]);
 
   const fetchPropertie = async () => {
@@ -60,24 +61,24 @@ const DetalheCriacao = ({ navigation, route }) => {
 
   const handleDelete = async () => {
     Alert.alert(
-      'Confirmação de Exclusão',
-      'Tem certeza de que deseja deletar esta criação?',
+      "Confirmação de Exclusão",
+      "Tem certeza de que deseja deletar esta criação?",
       [
         {
-          text: 'Cancelar',
-          onPress: () => console.log('Exclusão cancelada'),
-          style: 'cancel',
+          text: "Cancelar",
+          onPress: () => console.log("Exclusão cancelada"),
+          style: "cancel",
         },
         {
-          text: 'Confirmar',
+          text: "Confirmar",
           onPress: async () => {
             try {
               await dropCreation(creation.id);
-              console.log('Criação deletada com sucesso');
-              showFlashMessage("Criação deletada.", "danger")
-              navigation.goBack()
+              console.log("Criação deletada com sucesso");
+              showFlashMessage("Criação deletada.", "danger");
+              navigation.goBack();
             } catch (error) {
-              console.error('Erro ao deletar criação:', error);
+              console.error("Erro ao deletar criação:", error);
             }
           },
         },
@@ -106,15 +107,21 @@ const DetalheCriacao = ({ navigation, route }) => {
     }
 
     return (
-      <View style={{ paddingHorizontal: 20, height: "95%", gap: 20 }}>
+      <View style={{ flex: 1, paddingHorizontal: 20 }}>
         <FlatList
           data={vaccines}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CardVacina vacina={item} onDelete={fetchPropertie}/>} // Update this to your actual component
+          renderItem={({ item }) => (
+            <CardVacina vacina={item} onDelete={fetchPropertie} />
+          )}
           overScrollMode="never"
+          contentContainerStyle={{ paddingBottom: 80 }} // Adiciona espaço para o botão não sobrepor os itens
         />
         <TouchableOpacity
-          style={GlobalStyles.primaryButton}
+          style={[
+            GlobalStyles.primaryButton,
+            { position: "absolute", bottom: 20, left: 20, right: 20 },
+          ]}
           onPress={() =>
             navigation.navigate("AdicionarVacina", {
               creationID: creation.id,
@@ -131,7 +138,9 @@ const DetalheCriacao = ({ navigation, route }) => {
     if (!history || history.length === 0) {
       return (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Ainda não existe histórico para essa criação.</Text>
+          <Text style={styles.emptyText}>
+            Ainda não existe histórico para essa criação.
+          </Text>
         </View>
       );
     }
@@ -141,17 +150,12 @@ const DetalheCriacao = ({ navigation, route }) => {
         <FlatList
           data={history}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CardHistorico item={item}/>} // Update this to your actual component
+          renderItem={({ item }) => <CardHistorico item={item} />} // Update this to your actual component
           overScrollMode="never"
         />
       </View>
     );
   };
-
-  const renderScene = SceneMap({
-    vaccines: renderVacinas,
-    history: renderHistorico,
-  });
 
   return (
     <KeyboardAvoidingView
@@ -179,13 +183,24 @@ const DetalheCriacao = ({ navigation, route }) => {
                   })
                 }
               >
-                <FontAwesome5 name="edit" size={24} color="black" />
+                                <Image
+                source={require("../../assets/edit.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.editIcon}
-                onPress={handleDelete}
-              >
-                <FontAwesome5 name="trash" size={24} color={palette.danger} />
+              <TouchableOpacity style={styles.editIcon} onPress={handleDelete}>
+              <Image
+                source={require("../../assets/trash.png")}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
               </TouchableOpacity>
             </View>
           </View>
@@ -206,22 +221,36 @@ const DetalheCriacao = ({ navigation, route }) => {
           </View>
         </View>
 
-        <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{ width: Platform.OS === "ios" ? 375 : 360 }}
-          renderTabBar={(props) => (
-            <TabBar
-              {...props}
-              indicatorStyle={{ backgroundColor: palette.primaryGreen }}
-              style={{ backgroundColor: '#f1f1f1', marginBottom: 20, elevation: 0 }}
-              labelStyle={{ color: palette.highlightGreen, fontSize: 20, fontWeight: "bold" }}
-              activeColor={palette.highlightGreen} // Cor quando ativo
-              inactiveColor="gray" // Cor quando inativo
-            />
-          )}
-        />
+        <View style={styles.tabButtonsContainer}>
+          <TouchableOpacity
+            style={[styles.tabButton, index === 0 && styles.activeTabButton]}
+            onPress={() => setIndex(0)}
+          >
+            <Text
+              style={[
+                styles.tabButtonText,
+                index === 0 && styles.activeTabButtonText,
+              ]}
+            >
+              VACINAS
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tabButton, index === 1 && styles.activeTabButton]}
+            onPress={() => setIndex(1)}
+          >
+            <Text
+              style={[
+                styles.tabButtonText,
+                index === 1 && styles.activeTabButtonText,
+              ]}
+            >
+              HISTÓRICO
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {index === 0 ? renderVacinas() : renderHistorico()}
       </View>
     </KeyboardAvoidingView>
   );
@@ -241,7 +270,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   iconRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: "row-reverse",
     justifyContent: "flex-end",
     alignItems: "center",
     gap: 10,
@@ -253,10 +282,10 @@ const styles = StyleSheet.create({
     color: palette.highlightGreen,
   },
   edit: {
-    flexDirection: 'row',
+    flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    gap: 10
+    gap: 10,
   },
   text: {
     fontSize: 20,
@@ -277,6 +306,30 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: "white",
+    fontWeight: "bold",
+  },
+  tabButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#f1f1f1",
+    paddingVertical: 10,
+    marginBottom: 20,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  activeTabButton: {
+    borderBottomWidth: 3,
+    borderBottomColor: palette.primaryGreen,
+  },
+  tabButtonText: {
+    fontSize: 18,
+    color: "gray",
+  },
+  activeTabButtonText: {
+    color: palette.highlightGreen,
     fontWeight: "bold",
   },
 });
